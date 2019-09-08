@@ -1,0 +1,1 @@
+kafka-console-consumer --bootstrap-server localhost:9092 --topic cloud.distribution-node-17 --from-beginning

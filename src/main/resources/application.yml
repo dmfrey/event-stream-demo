@@ -1,0 +1,108 @@
+
+logging.level:
+  org.apache.kafka: INFO
+  org.springframework.cloud.stream: INFO
+  org.springframework.web: INFO
+  io.pivotal.dmfrey: DEBUG
+
+node:
+  current: local
+  available: local, cloud, node-17, node-34
+
+spring:
+
+  jackson:
+    serialization:
+      write_dates_as_timestamps: false
+
+  cloud:
+    stream:
+      bindings:
+        workorder-events-output:
+          destination: ${node.current}.workorder-events
+          contentType: application/json
+          producer:
+            headerMode: headers
+        workorder-events-input:
+          destination: ${node.current}.workorder-events
+          group: workorder-events-stream
+          contentType: application/json
+          consumer:
+            headerMode: headers
+      kafka:
+        streams:
+          binder:
+            configuration:
+              commit.interval.ms: 1000
+          bindings:
+            workorder-events-input:
+              consumer.application-id: ${node.current}.event-stream-demo
+            workorder-events-by-id:
+              consumer:
+                materializedAs: ${node.current}.workorder-events-by-id
+
+---
+spring:
+  profiles: node
+
+  cloud:
+    stream:
+      bindings:
+        workorder-events-distribution:
+          destination: ${node.current}.workorder-events
+          group: workorder-events-distribution
+          contentType: application/json
+          consumer:
+            headerMode: headers
+        workorder-events-distribution-cloud:
+          destination: ${node.current}.distribution-cloud
+          contentType: application/json
+
+---
+spring:
+  profiles: cloud
+
+  cloud:
+    stream:
+      bindings:
+        workorder-events-distribution:
+          destination: ${node.current}.workorder-events
+          group: workorder-events-distribution
+          contentType: application/json
+          consumer:
+            headerMode: headers
+        workorder-events-distribution-local:
+          destination: ${node.current}.distribution-local
+          contentType: application/json
+        workorder-events-distribution-node-17:
+          destination: ${node.current}.distribution-node-17
+          contentType: application/json
+        workorder-events-distribution-node-34:
+          destination: ${node.current}.distribution-node-34
+          contentType: application/json
+
+node:
+  current: cloud
+
+server:
+  port: 9090
+
+---
+spring:
+  profiles: node-17
+
+node:
+  current: node-17
+
+server:
+  port: 9017
+
+---
+spring:
+  profiles: node-34
+
+node:
+  current: node-34
+
+server:
+  port: 9034
