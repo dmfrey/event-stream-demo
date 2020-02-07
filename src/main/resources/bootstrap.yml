@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: event-stream-demo
+
+  cloud:
+    kubernetes:
+      reload:
+        enabled: true
+        mode: event
+      config:
+        sources:
+          - name: ${spring.application.name}
+        namespace:
