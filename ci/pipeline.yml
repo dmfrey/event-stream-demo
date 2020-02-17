@@ -1,0 +1,14 @@
+resources:
+
+  - name: repo
+    type: git
+    source:
+      uri: {{git_repo_uri}}
+      branch: master
+
+jobs:
+  - name: build-and-publish
+    plan:
+      - get: src-repo
+        resource: repo
+        trigger: true

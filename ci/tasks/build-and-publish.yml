@@ -1,0 +1,23 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: adoptopenjdk/openjdk11
+    tag: jdk-11.0.6_10-alpine
+
+inputs:
+  - name: src-repo
+
+outputs:
+  - name: artifacts
+
+caches:
+  - path: .m2/
+
+params:
+  BUILD_CMD: ./mvnw package
+
+run:
+  path: src-repo/ci/scripts/build-and-publish.sh
