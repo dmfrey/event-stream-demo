@@ -4,8 +4,8 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: adoptopenjdk/openjdk11
-    tag: jdk-11.0.6_10-alpine
+    repository: dmfrey/debian-openjdk11
+    tag: latest
 
 inputs:
   - name: src-repo

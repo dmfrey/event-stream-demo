@@ -13,5 +13,5 @@ jobs:
         resource: repo
         trigger: true
 
-      - task: build and publish
+      - task: build and publish with maven
         file: src-repo/ci/tasks/build-and-publish.yml
