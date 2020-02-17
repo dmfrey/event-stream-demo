@@ -233,6 +233,10 @@
 					</from>
 					<to>
 						<image>dmfrey/${project.artifactId}</image>
+						<tags>
+							<tag>${project.version}</tag>
+							<tag>latest</tag>
+						</tags>
 						<auth>
 							<username>${env.DOCKERHUB_USERNAME}</username>
 							<password>${env.DOCKERHUB_PASSWORD}</password>
