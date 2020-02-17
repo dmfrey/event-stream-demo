@@ -24,7 +24,7 @@ jobs: # a collection of steps
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: event-stream-demo-{{ checksum "pom.xml" }}
 
-      - run: mvn dependency:go-offline # gets the project dependencies
+      - run: ./mvnw dependency:go-offline # gets the project dependencies
 
       - save_cache: # saves the project dependencies
           paths:
