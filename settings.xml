@@ -5,7 +5,7 @@
 
     <servers>
         <server>
-            <id>docker.io</id>
+            <id>docker.com</id>
             <username>${env.DOCKERHUB_USERNAME}</username>
             <password>${env.DOCKERHUB_PASSWORD}</password>
         </server>
