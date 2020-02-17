@@ -32,6 +32,8 @@ spring:
           consumer:
             headerMode: headers
       kafka:
+        binder:
+          brokers: ["localhost:9092"]
         streams:
           binder:
             configuration:
@@ -52,70 +54,3 @@ management:
       show-details: ALWAYS
     restart:
       enabled: true
-
-#
-#---
-#spring:
-#  profiles: node
-#
-#  cloud:
-#    stream:
-#      bindings:
-#        workorder-events-distribution:
-#          destination: ${node.current}.workorder-events
-#          group: workorder-events-distribution
-#          contentType: application/json
-#          consumer:
-#            headerMode: headers
-#        workorder-events-distribution-cloud:
-#          destination: ${node.current}.distribution-cloud
-#          contentType: application/json
-#
-#---
-#spring:
-#  profiles: cloud
-#
-#  cloud:
-#    stream:
-#      bindings:
-#        workorder-events-distribution:
-#          destination: ${node.current}.workorder-events
-#          group: workorder-events-distribution
-#          contentType: application/json
-#          consumer:
-#            headerMode: headers
-#        workorder-events-distribution-local:
-#          destination: ${node.current}.distribution-local
-#          contentType: application/json
-#        workorder-events-distribution-node-17:
-#          destination: ${node.current}.distribution-node-17
-#          contentType: application/json
-#        workorder-events-distribution-node-34:
-#          destination: ${node.current}.distribution-node-34
-#          contentType: application/json
-#
-#node:
-#  current: cloud
-#
-#server:
-#  port: 9090
-#
-#---
-#spring:
-#  profiles: node-17
-#
-#node:
-#  current: node-17
-#
-#server:
-#  port: 9017
-#
-#---
-#spring:
-#  profiles: node-34
-#
-#node:
-#  current: node-34
-#
-#server:
-#  port: 9034

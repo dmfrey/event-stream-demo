@@ -1,0 +1,10 @@
+---
+spring:
+  profiles: node-17
+
+node:
+  current: node-17
+
+server:
+  port: 9017
+

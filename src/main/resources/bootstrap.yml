@@ -4,6 +4,15 @@ spring:
 
   cloud:
     kubernetes:
+      enabled: false
+
+---
+spring:
+  profiles: kubernetes
+
+  cloud:
+    kubernetes:
+      enabled: true
       reload:
         enabled: true
         mode: event

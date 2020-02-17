@@ -1,0 +1,38 @@
+
+# create k8s namespace
+$ kubectl create namespace node-17
+
+# install the strimzi operator to the namespace
+$ curl -L https://github.com/strimzi/strimzi-kafka-operator/releases/download/0.16.2/strimzi-cluster-operator-0.16.2.yaml \
+  | sed 's/namespace: .*/namespace: node-17/' \
+  | kubectl apply -f - -n node-17
+
+# provision kafka cluster to the namespace
+$ kubectl apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.16.2/examples/kafka/kafka-persistent-single.yaml -n node-17
+
+# create the roles
+$ kubectl create -f role.yml -n node-17
+
+# create the role bindings
+$ kubectl create -f rb.yml -n node-17
+
+# create the service account
+$ kubectl create -f sa.yml -n node-17
+
+# create the configmap properties
+$ kubectl create -f ConfigMap.yml -n node-17
+
+# create the deployment
+$ kubectl create -f node-17-deployment-definition.yml -n node-17
+
+# create the service
+$ kubectl create -f node-17-service-definition.yml -n node-17
+
+
+# NOTES:
+
+# get all details in node-17 namespace
+$ kubectl get all -o wide -n node-17
+
+# Port forward to node-17 app
+$ kubectl port-forward [event-stream-demo-pod-name] 9017:8080 -n cloud

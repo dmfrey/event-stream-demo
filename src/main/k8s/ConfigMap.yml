@@ -4,42 +4,97 @@ metadata:
   name: event-stream-demo
 data:
   application.yml: |-
+
     logging.level:
       org.apache.kafka: INFO
       org.springframework.cloud.stream: INFO
       org.springframework.web: INFO
       io.pivotal.dmfrey: DEBUG
-    ---
+
+    node:
+      current: local
+      available: local, cloud, node-17, node-34
+
     spring:
-      profiles: node
+
+      jackson:
+        serialization:
+          write_dates_as_timestamps: false
+
       cloud:
         stream:
           bindings:
-            workorder-events-distribution:
+            workorder-events-output:
               destination: ${node.current}.workorder-events
-              group: workorder-events-distribution
               contentType: application/json
-              consumer.headerMode: headers
-            workorder-events-distribution-cloud:
-              destination: ${node.current}.distribution-cloud
+              producer:
+                headerMode: headers
+            workorder-events-input:
+              destination: ${node.current}.workorder-events
+              group: workorder-events-stream
               contentType: application/json
+              consumer:
+                headerMode: headers
+          kafka:
+            binder:
+              brokers: ["localhost:9092"]
+            streams:
+              binder:
+                configuration:
+                  commit.interval.ms: 1000
+              bindings:
+                workorder-events-input:
+                  consumer.application-id: ${node.current}.event-stream-demo
+                workorder-events-by-id:
+                  consumer:
+                    materializedAs: ${node.current}.workorder-events-by-id
+
+    management:
+      endpoints:
+        web.exposure.include: "*"
+      endpoint:
+        health:
+          show-details: ALWAYS
+        restart:
+          enabled: true
+
     ---
     spring:
       profiles: kubernetes
+
       cloud:
+
+        kubernetes:
+          enabled: true
+
         stream:
           kafka:
             binder:
-              brokers: ["kafka-service.default.svc.cluster.local:9092"]
+              brokers: ["my-cluster-kafka-brokers.kafka:9092"]
+            streams:
+              binder:
+                brokers: ["my-cluster-kafka-brokers.kafka:9092"]
+              zk-nodes: ["my-cluster-zookeeper-nodes.kafka:2181"]
+            zk-nodes: ["my-cluster-zookeeper-nodes.kafka:2181"]
+      kafka:
+        streams:
+          bootstrap-servers: ["my-cluster-kafka-brokers.kafka:9092"]
+
+
     logging.level:
       org.apache.kafka: INFO
       org.springframework.cloud.stream: INFO
       org.springframework.security: DEBUG
       org.springframework.web: DEBUG
       io.pivotal.dmfrey: INFO
+
+    server:
+      port: 8080
+
     ---
     spring:
       profiles: cloud
+
       cloud:
         stream:
           bindings:
@@ -58,12 +113,33 @@ data:
             workorder-events-distribution-node-34:
               destination: ${node.current}.distribution-node-34
               contentType: application/json
+
     node.current: cloud
+
+    ---
+    spring:
+      profiles: node
+
+      cloud:
+        stream:
+          bindings:
+            workorder-events-distribution:
+              destination: ${node.current}.workorder-events
+              group: workorder-events-distribution
+              contentType: application/json
+              consumer.headerMode: headers
+            workorder-events-distribution-cloud:
+              destination: ${node.current}.distribution-cloud
+              contentType: application/json
+
     ---
     spring:
       profiles: node-17
+
     node.current: node-17
+
     ---
     spring:
       profiles: node-34
+
     node.current: node-34

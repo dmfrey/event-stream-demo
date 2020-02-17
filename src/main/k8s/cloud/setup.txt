@@ -1,0 +1,38 @@
+
+# create k8s namespace
+$ kubectl create namespace cloud
+
+# install the strimzi operator to the namespace
+$ curl -L https://github.com/strimzi/strimzi-kafka-operator/releases/download/0.16.2/strimzi-cluster-operator-0.16.2.yaml \
+  | sed 's/namespace: .*/namespace: cloud/' \
+  | kubectl apply -f - -n cloud
+
+# provision kafka cluster to the namespace
+$ kubectl apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.16.2/examples/kafka/kafka-persistent-single.yaml -n cloud
+
+# create the roles
+$ kubectl create -f role.yml -n cloud
+
+# create the role bindings
+$ kubectl create -f rb.yml -n cloud
+
+# create the service account
+$ kubectl create -f sa.yml -n cloud
+
+# create the configmap properties
+$ kubectl create -f ConfigMap.yml -n cloud
+
+# create the deployment
+$ kubectl create -f cloud-deployment-definition.yml -n cloud
+
+# create the service
+$ kubectl create -f cloud-service-definition.yml -n cloud
+
+
+# NOTES:
+
+# get all details in cloud namespace
+$ kubectl get all -o wide -n cloud
+
+# Port forward to cloud app
+$ kubectl port-forward [event-stream-demo-pod-name] 9090:8080 -n cloud

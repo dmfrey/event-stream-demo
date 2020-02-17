@@ -1,0 +1,17 @@
+---
+spring:
+  profiles: node
+
+  cloud:
+    stream:
+      bindings:
+        workorder-events-distribution:
+          destination: ${node.current}.workorder-events
+          group: workorder-events-distribution
+          contentType: application/json
+          consumer:
+            headerMode: headers
+        workorder-events-distribution-cloud:
+          destination: ${node.current}.distribution-cloud
+          contentType: application/json
+

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: event-stream-demo
+  name: event-stream-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event-stream-demo
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: event-stream-demo
+    spec:
+      serviceAccountName: "config-reader"
+      containers:
+      - image: dmfrey/event-stream-demo
+        name: event-stream-demo
+        ports:
+          - containerPort: 8080
+        env:
+          - name: SPRING_PROFILES_ACTIVE
+            value: local,node,kubernetes
+        volumeMounts:
+        - name: config
+          mountPath: /deployments/config
+        resources: {}
+      volumes:
+        - name: config
+          configMap:
+            name: event-stream-demo
+            items:
+              - key: application.yml
+                path: application.yml
+status: {}
