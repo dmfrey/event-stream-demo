@@ -12,3 +12,6 @@ jobs:
       - get: src-repo
         resource: repo
         trigger: true
+
+      - task: build and publish
+        file: src-repo/ci/tasks/build-and-publish.yml
