@@ -233,6 +233,10 @@
 					</from>
 					<to>
 						<image>dmfrey/${project.artifactId}</image>
+						<auth>
+							<username>${env.DOCKERHUB_USERNAME}</username>
+							<password>${env.DOCKERHUB_PASSWORD}</password>
+						</auth>
 					</to>
 					<container>
 						<user>nobody:nogroup</user>
