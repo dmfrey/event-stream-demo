@@ -1,3 +1,5 @@
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/dmfrey/event-stream-demo) 
+
 # Event Stream Demo
 
 The purpose of this demo is to illustrate how events that originate in the cloud
