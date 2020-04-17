@@ -7,9 +7,7 @@ import lombok.ToString;
 import io.pivotal.dmfrey.workorder.domain.WorkorderExceptions.*;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
@@ -108,6 +106,17 @@ public class Workorder {
     public String lastModifiedUser() {
 
         return lastModifiedUser;
+    }
+
+    public Map<String, Object> getWorkorderView() {
+
+        return Map.of(
+            "workorderId", this.id(),
+            "title", this.title(),
+            "state", this.state(),
+            "assigned", this.assigned(),
+            "origination", this.origination()
+        );
     }
 
     // Actions

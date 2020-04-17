@@ -6,9 +6,13 @@ import io.pivotal.dmfrey.node.application.in.NodeValidatorQuery;
 import io.pivotal.dmfrey.workorder.application.in.OpenWorkorderUseCase;
 import io.pivotal.dmfrey.workorder.application.out.GetWorkorderEventsPort;
 import io.pivotal.dmfrey.workorder.application.out.PersistWorkorderEventPort;
+import io.pivotal.dmfrey.workorder.domain.Workorder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import io.pivotal.dmfrey.workorder.domain.Workorder;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 @Slf4j
 @UseCase
@@ -19,11 +23,13 @@ class OpenWorkorderService implements OpenWorkorderUseCase {
     private final PersistWorkorderEventPort persistWorkorderEventPort;
     private final NodeValidatorQuery nodeValidatorQuery;
     private final TimestampGenerator timestampGenerator;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     private final String user = "testUser";
 
     @Override
-    public void execute( OpenWorkorderCommand command ) {
+    @Transactional
+    public Map<String, Object> execute( OpenWorkorderCommand command ) {
 
         Workorder foundWorker = Workorder.createFrom( command.getWorkorderId(), getWorkorderEventsPort.getWorkorderEvents( command.getWorkorderId() ) );
         foundWorker.flushChanges();
@@ -32,6 +38,10 @@ class OpenWorkorderService implements OpenWorkorderUseCase {
         this.persistWorkorderEventPort.save( foundWorker.id(), foundWorker.changes() );
         foundWorker.flushChanges();
 
+//        WorkorderUpdatedEvent broadcastMessage = new WorkorderUpdatedEvent( foundWorker, "Workorder", foundWorker.id(), foundWorker.getWorkorderView() );
+//        this.applicationEventPublisher.publishEvent( broadcastMessage );
+
+        return foundWorker.getWorkorderView();
     }
 
 }

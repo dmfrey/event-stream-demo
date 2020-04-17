@@ -7,11 +7,12 @@ import lombok.Getter;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Map;
 import java.util.UUID;
 
 public interface TransferWorkorderUseCase {
 
-    void execute( TransferWorkorderCommand command );
+    Map<String, Object> execute( TransferWorkorderCommand command );
 
     @Getter
     @EqualsAndHashCode( callSuper = false )

@@ -43,6 +43,7 @@ public class NameUpdated extends AbstractWorkOrderDomainEvent {
     }
 
     @Override
+    @JsonProperty
     public String eventType() {
 
         return this.getClass().getSimpleName();

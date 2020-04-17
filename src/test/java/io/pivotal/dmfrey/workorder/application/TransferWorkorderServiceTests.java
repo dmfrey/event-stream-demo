@@ -11,6 +11,7 @@ import io.pivotal.dmfrey.workorder.domain.events.WorkorderDomainEvent;
 import io.pivotal.dmfrey.workorder.domain.events.WorkorderOpened;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -29,6 +30,7 @@ public class TransferWorkorderServiceTests {
     private PersistWorkorderEventPort mockPersistWorkorderEventPort;
     private NodeValidatorQuery mockNodeValidatorQuery;
     private TimestampGenerator mockTimestampGenerator;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     private UUID fakeWorkorderId = UUID.randomUUID();
     private String fakeTitle = "fakeTitle";
@@ -45,7 +47,7 @@ public class TransferWorkorderServiceTests {
         this.mockNodeValidatorQuery = mock( NodeValidatorQuery.class );
         this.mockTimestampGenerator = mock( TimestampGenerator.class );
 
-        this.subject = new TransferWorkorderService( this.mockGetWorkorderEventsPort, this.mockPersistWorkorderEventPort, this.mockNodeValidatorQuery, this.mockTimestampGenerator );
+        this.subject = new TransferWorkorderService( this.mockGetWorkorderEventsPort, this.mockPersistWorkorderEventPort, this.mockNodeValidatorQuery, this.mockTimestampGenerator, this.applicationEventPublisher );
 
         when( this.mockNodeValidatorQuery.execute( any(NodeValidatorQuery.ValidateNodeCommand.class ) ) ).thenReturn( fakeNode );
         when( this.mockTimestampGenerator.generate() ).thenReturn( fakeOccurredOn );

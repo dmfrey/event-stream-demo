@@ -4,7 +4,7 @@ logging:
     org.apache.kafka: WARN
     org.springframework.cloud: DEBUG
     org.springframework.cloud.stream: INFO
-    org.springframework.web: INFO
+    org.springframework.web: DEBUG
     io.pivotal.dmfrey: DEBUG
 
 node:

@@ -8,6 +8,7 @@ import io.pivotal.dmfrey.workorder.application.out.PersistWorkorderEventPort;
 import io.pivotal.dmfrey.workorder.domain.events.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -26,6 +27,7 @@ public class StopWorkorderServiceTests {
     private PersistWorkorderEventPort mockPersistWorkorderEventPort;
     private NodeValidatorQuery mockNodeValidatorQuery;
     private TimestampGenerator mockTimestampGenerator;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     private UUID fakeWorkorderId = UUID.randomUUID();
     private String fakeTitle = "fakeTitle";
@@ -41,7 +43,7 @@ public class StopWorkorderServiceTests {
         this.mockNodeValidatorQuery = mock( NodeValidatorQuery.class );
         this.mockTimestampGenerator = mock( TimestampGenerator.class );
 
-        this.subject = new StopWorkorderService( this.mockGetWorkorderEventsPort, this.mockPersistWorkorderEventPort, this.mockNodeValidatorQuery, this.mockTimestampGenerator );
+        this.subject = new StopWorkorderService( this.mockGetWorkorderEventsPort, this.mockPersistWorkorderEventPort, this.mockNodeValidatorQuery, this.mockTimestampGenerator, this.applicationEventPublisher );
 
         when( this.mockNodeValidatorQuery.execute( any(NodeValidatorQuery.ValidateNodeCommand.class ) ) ).thenReturn( fakeNode );
         when( this.mockTimestampGenerator.generate() ).thenReturn( fakeOccurredOn );

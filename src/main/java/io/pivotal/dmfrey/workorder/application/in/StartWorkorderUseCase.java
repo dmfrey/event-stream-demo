@@ -5,11 +5,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 import java.util.UUID;
 
 public interface StartWorkorderUseCase {
 
-    void execute( StartWorkorderCommand command );
+    Map<String, Object> execute( StartWorkorderCommand command );
 
     @Getter
     @EqualsAndHashCode( callSuper = false )

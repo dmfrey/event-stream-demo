@@ -3,11 +3,10 @@ package io.pivotal.dmfrey.workorder.application;
 import io.pivotal.dmfrey.common.useCase.UseCase;
 import io.pivotal.dmfrey.workorder.application.in.GetWorkorderQuery;
 import io.pivotal.dmfrey.workorder.application.out.GetWorkorderEventsPort;
+import io.pivotal.dmfrey.workorder.domain.Workorder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import io.pivotal.dmfrey.workorder.domain.Workorder;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -23,14 +22,7 @@ class GetWorkorderService implements GetWorkorderQuery {
         Workorder foundWorker = Workorder.createFrom( command.getWorkorderId(), getWorkorderEventsPort.getWorkorderEvents( command.getWorkorderId() ) );
         foundWorker.flushChanges();
 
-        Map<String, Object> view = new HashMap<>();
-        view.put( "workorderId", foundWorker.id() );
-        view.put( "title", foundWorker.title() );
-        view.put( "state", foundWorker.state() );
-        view.put( "assigned", foundWorker.assigned() );
-        view.put( "origination", foundWorker.origination() );
-
-        return view;
+        return foundWorker.getWorkorderView();
     }
 
 }

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Work Orders</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/webjars/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/webjars/font-awesome/css/all.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand" href="/">Work Orders</a>
+    </nav>
+
+    <div class="container">
+        <div class="workorders">
+
+            <div class="row">
+
+                <div class="col-md-4">
+                    <header>Work Orders</header>
+                    <div id="wo-list">
+
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <header>Work Orders Details</header>
+                    <div id="wo-details">
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="create-workorder-form-container" class="workorders"></div>
+
+    </div>
+
+</body>
+
+<script src="/webjars/jquery/jquery.min.js"></script>
+<script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+<script src="/webjars/sockjs-client/sockjs.min.js"></script>
+<script src="/webjars/stomp-websocket/stomp.min.js"></script>
+<script src="/js/mustache.min.js"></script>
+<script src="/js/script.js"></script>
+<script src="/js/socket.js"></script>
+
+<script id="workorderStatusTemplate" type="text/html">
+    <div class="row wo-list-item" data-workorderId="{{workorderId}}">
+        <span class="col-sm-5">{{workorderKey}}</span>
+        <span class="col-sm-5">{{title}}</span>
+    </div>
+</script>
+
+<script id="workorderTemplate" type="text/html">
+    <div class="row">
+        <span class="col-md-5">{{title}}</span>
+        <span class="col-md-5">State: {{state}}</span>
+    </div>
+    <div class="row">
+        <span class="col-md-5">Assigned Node: {{assigned}}</span>
+        <span class="col-md-5">Origination Node: {{origination}}</span>
+    </div>
+    <div class="row">
+        <form id="transfer-workorder" action="/workorders/{{workorderId}}/transfer" method="put" class="col-md-12">
+            <label for="targetNode">Target Node:</label>
+            <select name="targetNode">{{#options}}
+                <option value="{{value}}" {{#selected}}selected="selected"{{/selected}}>{{text}}</option>
+                {{/options}}</select>
+            <input id="transfer-workorder-submit" type="submit" value="Transfer Work Order" />
+        </form>
+    </div>
+    <div class="row">
+        <span class="col-md-2">
+            <button class="btn btn-primary btn-wo-open" data-workorderId="{{workorderId}}">Open</button>
+        </span>
+        <span class="col-md-2">
+            <button class="btn btn-success btn-wo-start" data-workorderId="{{workorderId}}">Start</button>
+        </span>
+        <span class="col-md-2">
+            <button class="btn btn-danger btn-wo-stop" data-workorderId="{{workorderId}}">Stop</button>
+        </span>
+        <span class="col-md-2">
+            <button class="btn btn-primary btn-wo-complete" data-workorderId="{{workorderId}}">Complete</button>
+        </span>
+    </div>
+</script>
+
+<script id="createWorkorderFormTemplate" type="text/html">
+    <header> Create New Work Order</header>
+
+    <form id="create-workorder" action="/workorders" method="post">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" placeholder="Title" />
+        <label for="targetNode">Target Node</label>
+        <select id="targetNode" name="targetNode">{{#options}}
+            <option value="{{value}}" {{#selected}}selected="selected"{{/selected}}>{{text}}</option>
+            {{/options}}</select>
+        <input id="create-workorder-submit" type="submit" value="Create Work Order" />
+    </form>
+</script>
+
+</html>

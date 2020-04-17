@@ -1,0 +1,66 @@
+
+<header>
+    <h3>Work Order</h3>
+</header>
+
+<section class="details">
+
+    <p>
+        <span>Title:</span>
+    </p>
+    <p>
+        <span>State:</span>
+    </p>
+
+</section>
+
+<section class="transfer">
+
+    <form id="transfer-form">
+
+        <p>
+        <label for="targetNode">Target Node</label>
+        <select id="targetNode" name="targetNode">
+            <option value="---">---</option>
+        </select>
+        </p>
+
+        <p>
+        <input type="submit" value="Transfer" />
+        </p>
+
+    </form>
+
+</section>
+
+<section class="actions">
+
+    <form id="open-form">
+
+        <input type="hidden" name="workorderId" value="" />
+        <input type="submit" value="Open" />
+
+    </form>
+
+    <form id="start-form">
+
+        <input type="hidden" name="workorderId" value="" />
+        <input type="submit" value="Start" />
+
+    </form>
+
+    <form id="stop-form">
+
+        <input type="hidden" name="workorderId" value="" />
+        <input type="submit" value="Stop" />
+
+    </form>
+
+    <form id="complete-form">
+
+        <input type="hidden" name="workorderId" value="" />
+        <input type="submit" value="Complete" />
+
+    </form>
+
+</section>

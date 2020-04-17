@@ -39,7 +39,7 @@ function showEntry(entry) {
             action = "Completed";
             message += " completed";
             break;
-        case "NodeAssiegned" :
+        case "NodeAssigned" :
             action = "Assigned";
             message += " assigned";
             break;
@@ -52,7 +52,13 @@ function showEntry(entry) {
 }
 
 $(function () {
-    connect();
+
+    if( navigator.onLine ) {
+
+        connect();
+
+    }
+
 });
 
 // function for creating the notification

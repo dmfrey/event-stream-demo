@@ -68,6 +68,7 @@ public class WorkorderDomainEventIgnored implements WorkorderDomainEvent {
     }
 
     @Override
+    @JsonProperty
     public String eventType() {
 
         return this.getClass().getSimpleName();

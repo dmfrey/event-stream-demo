@@ -1,0 +1,153 @@
+html, body {
+    height: 100%;
+}
+
+nav {
+
+    position: absolute;
+    left: 0;
+    width: 200px;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+}
+
+wo-menu {
+
+    flex: 1;
+    min-width: 95%;
+
+    padding: .5rem;
+
+    background-color: red;
+}
+
+wo-menu ul {
+
+    padding: 0;
+    list-style-type: none;
+
+}
+
+wo-menu ul li {
+
+    cursor: pointer;
+
+}
+
+wo-favorites {
+
+    flex: 1;
+    min-width: 95%;
+
+    padding: .5rem;
+
+    background-color: #1e7e34;
+}
+
+div#content {
+
+    margin-left: 200px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+}
+
+div#content > .split-vertical {
+
+    flex: 1;
+
+}
+
+wo-control {
+
+    padding: .5rem;
+
+    background-color: #005cbf;
+
+}
+
+.split-horizontal {
+
+    display: flex;
+    flex-direction: row;
+
+}
+
+wo-workorders {
+
+    flex: 1;
+    padding: .5rem;
+
+}
+
+wo-offline-queue {
+
+    flex: 1;
+    padding: .5rem;
+
+}
+
+.actions {
+
+    display: flex;
+
+}
+
+.actions > form {
+
+    flex: 1;
+    max-width: 5%;
+
+}
+
+.wo-list-item {
+
+    flex: 1;
+    max-width: 40%;
+    padding: .5rem;
+    vertical-align: middle;
+    margin-bottom: .5rem;
+
+}
+
+.INITIALIZED {
+
+    background-color: yellow;
+
+}
+
+.OPEN {
+
+    background-color: #1e7e34;
+
+}
+
+.START {
+
+    background-color: blue;
+
+}
+
+.STOP {
+
+    background-color: red;
+
+}
+
+.COMPLETE {
+
+    background-color: #1e7e34;
+
+}
+
+.wo-list-item > span {
+
+    float: right;
+    text-align: end;
+    padding: .1rem;
+    background-color: #95999c;
+}

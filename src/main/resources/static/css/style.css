@@ -1,17 +1,93 @@
+.container {
+    position: relative;
+}
+
+nav {
+    position: absolute;
+    left: 0;
+    width: 200px;
+    height: 100%;
+}
+
+#content {
+    /* position is static by default */
+    margin-left: 200px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.split-vertical {
+    flex: 1;
+    min-height: 45%;
+
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+
+    padding: .5rem;
+
+    overflow: hidden;
+}
+
+.split-horizontal {
+    display: flex;
+    flex-direction: row;
+    height: inherit;
+    padding: .5rem;
+
+    overflow: hidden;
+
+}
+
+.split-horizontal > div {
+    flex: 1;
+    max-width: 45%;
+    padding: .5rem;
+
+    overflow: scroll;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 70px;
+    background-color: white;
+    width: 100%;
+}
+
 body {
-    padding-top: 5rem;
+    margin-bottom: 120px;
 }
 
-header {
-    padding: 2rem 1.5rem;
-    text-align: center;
+html, body {
+    height: 100%;
 }
 
-.workorders {
-    padding: 3rem 1.5rem;
-    text-align: center;
-}
+/*body {*/
+/*    padding-top: 5rem;*/
+/*}*/
 
-#wo-list > .row, #wo-details > .row {
-    padding: .5rem .5rem;
-}
+/*header {*/
+/*    padding: 2rem 1.5rem;*/
+/*    text-align: center;*/
+/*}*/
+
+/*.container {*/
+/*    display: flex;*/
+/*    align-items: start;*/
+/*}*/
+
+/*.container > div {*/
+/*    flex: 1;*/
+/*}*/
+
+/*#workorders-list-container {*/
+/*    padding: 3rem 1.5rem;*/
+/*    text-align: center;*/
+/*}*/
+
+/*#wo-list > .row, #wo-details > .row {*/
+/*    padding: .5rem .5rem;*/
+/*}*/

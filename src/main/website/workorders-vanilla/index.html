@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <title>Work Orders</title>
+    <base href="/" target="_blank">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="theme-color" content="#FFFFFF" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com 'unsafe-eval' 'unsafe-inline'; child-src 'self'; connect-src 'self' ws:; font-src 'self'; frame-src 'self'; img-src 'self'; media-src 'self'; object-src 'none'; style-src 'self';">
+    <link rel="manifest" href="./manifest.json" />
+    <meta name="application-name" content="Work Orders" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <script type="module" src="./js/app.js"></script>
+
+    <nav>
+
+        <wo-menu menu-item="new-workorder"></wo-menu>
+        <wo-favorites></wo-favorites>
+
+    </nav>
+
+    <div id="content">
+
+        <wo-control id="control-container" class="split-vertical" start="new-workorder" workorderId=""></wo-control>
+
+        <section class="split-vertical split-horizontal">
+
+            <wo-workorders></wo-workorders>
+            <wo-offline-queue></wo-offline-queue>
+
+        </section>
+
+    </div>
+
+    <div id="dispatch" />
+
+</body>
+
+</html>

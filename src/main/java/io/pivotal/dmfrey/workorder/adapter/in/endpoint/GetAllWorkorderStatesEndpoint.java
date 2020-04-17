@@ -5,6 +5,7 @@ import io.pivotal.dmfrey.workorder.application.in.GetAllWorkorderStatesQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Slf4j
@@ -14,6 +15,7 @@ public class GetAllWorkorderStatesEndpoint {
 
     private final GetAllWorkorderStatesQuery useCase;
 
+    @CrossOrigin
     @GetMapping( "/workorders" )
     public ResponseEntity allWorkorderStates() {
 

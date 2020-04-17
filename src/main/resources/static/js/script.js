@@ -1,3 +1,24 @@
+
+if( 'serviceWorker' in navigator ) {
+
+    window.addEventListener( 'load', function() {
+        navigator.serviceWorker.register( '/service-worker.js' ).then( function ( registration ) {
+
+            // Registration was successful
+            console.log( 'serviceWorker registration successful with scope: ', registration.scope );
+
+        }, function( error ) {
+
+            // Registration failed
+            console.error( 'serviceWorker registration failed: ', error );
+
+        });
+    });
+
+} else {
+    console.warn( 'serviceWorker not supported' );
+}
+
 $( document ).ready( function() {
 
     createNewWorkorderForm();
@@ -117,8 +138,9 @@ function transferWorkorder( form ) {
 
 function getWorkorderStates() {
 
-    $.get( "/workorders" )
-        .done( function( data ) {
+    fetch( "/workorders" )
+        .then( (response) => response.json() )
+        .then( ( data ) => {
             console.dir( data );
 
             $( "#wo-list" ).empty();
@@ -137,8 +159,9 @@ function getWorkorderStates() {
 
 function getWorkorderDetails( workorderId ) {
 
-    $.get( "/workorders/" + workorderId )
-        .done( function( data ) {
+    fetch( "/workorders/" + workorderId )
+        .then( (response) => response.json() )
+        .then( ( data ) => {
             console.dir( data );
 
             var details = $( "#wo-details" );
@@ -218,8 +241,9 @@ function changeWorkorderState( workorderId, action ) {
 
 function createNewWorkorderForm() {
 
-    $.get( "/nodes" )
-        .done( function( data ) {
+    fetch( "/nodes" )
+        .then( (response) => response.json() )
+        .then( ( data ) => {
             console.dir( data );
 
             currentNode = data.currentNode;

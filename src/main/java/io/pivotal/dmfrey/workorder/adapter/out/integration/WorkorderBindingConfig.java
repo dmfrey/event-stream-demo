@@ -3,6 +3,7 @@ package io.pivotal.dmfrey.workorder.adapter.out.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.pivotal.dmfrey.workorder.adapter.out.integration.serdes.ArrayListSerde;
 import io.pivotal.dmfrey.workorder.domain.events.WorkorderDomainEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
@@ -17,23 +18,23 @@ import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Component
 @EnableBinding( WorkorderBindingConfig.WorkorderEventsProcessor.class )
 class WorkorderBindingConfig {
 
+    private final ObjectMapper mapper;
     private final Serde<WorkorderDomainEvent> domainEventSerde;
-    private final SimpMessageSendingOperations messagingTemplate;
 
-    WorkorderBindingConfig( final ObjectMapper objectMapper, final SimpMessageSendingOperations messagingTemplate ) {
+    WorkorderBindingConfig( final ObjectMapper mapper ) {
 
-        this.domainEventSerde = new JsonSerde<>( WorkorderDomainEvent.class, objectMapper );
-        this.messagingTemplate = messagingTemplate;
+        this.mapper = mapper;
+        this.domainEventSerde = new JsonSerde<>( WorkorderDomainEvent.class, mapper );
 
     }
 
@@ -46,8 +47,6 @@ class WorkorderBindingConfig {
                 .aggregate(
                         ArrayList::new,
                         (key, value, list) -> {
-
-                            messagingTemplate.convertAndSend( "/topic/events", value );
 
                             list.add( value );
                             return list;
