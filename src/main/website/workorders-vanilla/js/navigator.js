@@ -58,8 +58,8 @@ export class Navigator extends HTMLElement {
 
     showControl( control, route ) {
 
-        console.dir( control );
-        console.log( this );
+        // console.dir( control );
+        // console.log( this );
 
         this.innerHTML = '';
         this.appendChild( control );

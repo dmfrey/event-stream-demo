@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="theme-color" content="#FFFFFF" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com 'unsafe-eval' 'unsafe-inline'; child-src 'self'; connect-src 'self' ws:; font-src 'self'; frame-src 'self'; img-src 'self'; media-src 'self'; object-src 'none'; style-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com 'unsafe-eval' 'unsafe-inline'; child-src 'self'; connect-src 'self' ws: http://localhost:9090; font-src 'self'; frame-src 'self'; img-src 'self'; media-src 'self'; object-src 'none'; style-src 'self';">
     <link rel="manifest" href="./manifest.json" />
     <meta name="application-name" content="Work Orders" />
     <link rel="stylesheet" href="css/style.css">
@@ -30,14 +30,34 @@
 
         <section class="split-vertical split-horizontal">
 
-            <wo-workorders></wo-workorders>
-            <wo-offline-queue></wo-offline-queue>
+            <wo-workorders reload="false"></wo-workorders>
+            <wo-offline-queue reload="false"></wo-offline-queue>
 
         </section>
 
     </div>
 
-    <div id="dispatch" />
+    <wo-websocket offline="false">
+
+        <div id="dispatch" />
+
+    </wo-websocket>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register( './service-worker.js', { scope: '/' } )
+                .then(() => {
+                    console.info( 'Workorders Service Worker Registered' );
+                }, err => console.error( "Workorders Service Worker registration failed: ", err ) );
+
+            navigator.serviceWorker
+                .ready
+                .then(() => {
+                    console.info( 'Workorders Service Worker Ready' );
+                });
+        }
+    </script>
 
 </body>
 

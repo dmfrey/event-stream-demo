@@ -11,17 +11,17 @@ export default class Repository {
     }
 
     async _openDatabase() {
-        console.log( 'openDatabase : enter' );
+        console.log( 'repository : Opening Database' );
 
         // If the browser doesn't support service worker,
         // we don't care about having a database
         if( !navigator.serviceWorker ) {
-            console.log( 'openDatabase : exit, serviceWorker not supported' );
+            console.log( 'repository : Opening Database exited, serviceWorker not supported' );
 
             return Promise.resolve();
         }
 
-        return await this._openDB( 'workorders-db', 3, {
+        return await this._openDB( 'workorders-db', 1, {
 
             upgrade( db, oldVersion, newVersion, transaction ) {
                 console.log( 'openDB - upgrade : enter [oldVersion: ' + oldVersion + ', newVersion: ' + newVersion + ']' );
@@ -29,6 +29,7 @@ export default class Repository {
                 switch( newVersion ) {
 
                     case 1:
+
                         db.createObjectStore('workorders-store', {
                             keyPath: 'workorderId'
                         });

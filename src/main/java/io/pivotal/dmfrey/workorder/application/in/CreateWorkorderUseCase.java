@@ -6,11 +6,11 @@ import lombok.Getter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.util.UUID;
+import java.util.Map;
 
 public interface CreateWorkorderUseCase {
 
-    UUID execute( CreateWorkorderCommand command );
+    Map<String, Object> execute( CreateWorkorderCommand command );
 
     @Getter
     @EqualsAndHashCode( callSuper = false )

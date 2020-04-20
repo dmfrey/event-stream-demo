@@ -9,7 +9,18 @@ export default class WorkordersWebSocket {
         this._socketUrl = null;
         this._ws = null;
 
+        this._registerEventListeners();
+
+        this._offline = true;
+
         this._openSocket();
+
+    }
+
+    _registerEventListeners() {
+
+        window.addEventListener( 'online', () => this.goOnline() );
+        window.addEventListener( 'offline', () => this.goOffline() );
 
     }
 
@@ -23,14 +34,20 @@ export default class WorkordersWebSocket {
         this._ws = new WebSocket( this._socketUrl.href );
 
         this._ws.onopen = ( event ) => {
-            console.log( `Opening connection to websocket [${workordersWebSocket._socketUrl.href}]` );
-            console.dir( event );
+            console.log( `websocket : Opening connection to websocket [${workordersWebSocket._socketUrl.href}]` );
+            // console.dir( event );
+
+            workordersWebSocket._offline = false;
+            workordersWebSocket._dispatch.dispatchEvent( new CustomEvent( 'WebSocketOnline' ) );
 
         };
 
         this._ws.onclose = function( event ) {
-            console.log( `Closing connection to websocket [${workordersWebSocket._socketUrl.href}]` );
-            console.dir( event );
+            console.log( `websocket : Closing connection to websocket [${workordersWebSocket._socketUrl.href}]` );
+            // console.dir( event );
+
+            workordersWebSocket._offline = true;
+            workordersWebSocket._dispatch.dispatchEvent( new CustomEvent( 'WebSocketOffline' ) );
 
             setTimeout(function() {
                 workordersWebSocket._openSocket();
@@ -39,19 +56,22 @@ export default class WorkordersWebSocket {
         };
 
         this._ws.onerror = function( error ) {
-            console.log( `Error connection to websocket [${workordersWebSocket._socketUrl.href}]` );
-            console.dir( error );
+            console.log( `websocket : Error connection to websocket [${workordersWebSocket._socketUrl.href}]` );
+            // console.dir( error );
+
+            workordersWebSocket._offline = true;
+            workordersWebSocket._dispatch.dispatchEvent( new CustomEvent( 'WebSocketOffline' ) );
 
         };
 
         this._ws.onmessage = function( event ) {
-            console.log( `Received message from websocket [${workordersWebSocket._socketUrl.href}]` );
+            console.log( `websocket : Received message from websocket [${workordersWebSocket._socketUrl.href}]` );
 
             if( workordersWebSocket._eventTypes.length == 0 ) return;
 
             let message = JSON.parse( event.data );
-            console.dir( message );
-            console.dir( workordersWebSocket._eventTypes );
+            // console.dir( message );
+            // console.dir( workordersWebSocket._eventTypes );
 
             workordersWebSocket._eventTypes
                 .filter( (listener) => message.type === listener )
@@ -61,30 +81,39 @@ export default class WorkordersWebSocket {
 
     }
 
-    // get socket() {
-    //
-    //     return this._ws;
-    // }
-
     get isConnected() {
 
-        if( null == this._ws ) return false;
+        if( null == this._ws || this._offline ) return false;
 
         return ( this._ws.readyState === WebSocket.OPEN );
     }
 
     send( message ) {
-        console.log( `Sending message to websocket [${this._socketUrl.href}]` );
-        console.dir( message );
+        console.log( `websocket : Sending message to websocket [${this._socketUrl.href}]` );
+        // console.dir( message );
 
         this._ws.send( JSON.stringify( message ) );
 
     }
 
     registerEventType( listener ) {
-        console.log( `Registered event type [${listener}]` );
+        console.log( `websocket : Registered event type [${listener}]` );
 
         this._eventTypes.push( listener );
+
+    }
+
+    goOnline() {
+
+        this._offline = false;
+        this._dispatch.dispatchEvent( new CustomEvent( 'WebSocketOnline' ) );
+
+    }
+
+    goOffline() {
+
+        this._offline = true;
+        this._dispatch.dispatchEvent( new CustomEvent( 'WebSocketOffline' ) );
 
     }
 

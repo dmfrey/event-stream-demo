@@ -4,13 +4,14 @@ import io.pivotal.dmfrey.common.useCase.TimestampGenerator;
 import io.pivotal.dmfrey.common.useCase.UseCase;
 import io.pivotal.dmfrey.common.useCase.UuidGenerator;
 import io.pivotal.dmfrey.node.application.in.NodeValidatorQuery;
+import io.pivotal.dmfrey.node.application.in.NodeValidatorQuery.ValidateNodeCommand;
 import io.pivotal.dmfrey.workorder.application.in.CreateWorkorderUseCase;
 import io.pivotal.dmfrey.workorder.application.out.PersistWorkorderEventPort;
-import lombok.RequiredArgsConstructor;
 import io.pivotal.dmfrey.workorder.domain.Workorder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+import java.util.Map;
 
 @UseCase
 @RequiredArgsConstructor
@@ -25,11 +26,11 @@ class CreateWorkorderService implements CreateWorkorderUseCase {
 
     @Override
     @Transactional
-    public UUID execute( CreateWorkorderCommand command ) {
+    public Map<String, Object> execute( CreateWorkorderCommand command ) {
 
         Workorder workorder = new Workorder( this.uuidGenerator.generate() );
 
-        String node = this.nodeValidatorQuery.execute( new NodeValidatorQuery.ValidateNodeCommand() );
+        String node = this.nodeValidatorQuery.execute( new ValidateNodeCommand() );
 
         workorder.updateName( command.getTitle(), user, node, this.timestampGenerator.generate() );
 
@@ -42,7 +43,7 @@ class CreateWorkorderService implements CreateWorkorderUseCase {
         this.persistWorkorderEventPort.save( workorder.id(), workorder.changes() );
         workorder.flushChanges();
 
-        return workorder.id();
+        return workorder.getWorkorderView();
     }
 
 }

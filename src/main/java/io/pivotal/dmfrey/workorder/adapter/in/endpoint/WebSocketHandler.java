@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.pivotal.dmfrey.workorder.application.in.*;
 import io.pivotal.dmfrey.workorder.application.in.CompleteWorkorderUseCase.CompleteWorkorderCommand;
+import io.pivotal.dmfrey.workorder.application.in.CreateWorkorderUseCase.CreateWorkorderCommand;
 import io.pivotal.dmfrey.workorder.application.in.GetAllWorkorderStatesQuery.GetAllWorkorderStatesCommand;
 import io.pivotal.dmfrey.workorder.application.in.GetWorkorderQuery.GetWorkorderCommand;
 import io.pivotal.dmfrey.workorder.application.in.OpenWorkorderUseCase.OpenWorkorderCommand;
@@ -28,6 +29,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WebSocketHandler extends AbstractWebSocketHandler {
 
+    private final CreateWorkorderUseCase createWorkorderUseCase;
     private final GetAllWorkorderStatesQuery getAllWorkorderStatesQuery;
     private final GetWorkorderQuery getWorkorderQuery;
     private final OpenWorkorderUseCase openWorkorderUseCase;
@@ -81,6 +83,24 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
 
         }
 
+        if( request instanceof CreateWorkorderRequest ) {
+
+            CreateWorkorderRequest createWorkorderRequest = (CreateWorkorderRequest) request;
+            Map<String, Object> websocketResponse =
+                    Map.of(
+                            "requestId", createWorkorderRequest.getRequestId(),
+                            "type", "WorkorderCreated",
+                            "workorder", this.createWorkorderUseCase.execute( new CreateWorkorderCommand( createWorkorderRequest.getTitle(), createWorkorderRequest.getTargetNode() ) )
+                    );
+
+            String responseJson = this.mapper.writeValueAsString( websocketResponse );
+
+            WebSocketMessage<String> msg = new TextMessage( responseJson );
+            session.sendMessage( msg );
+            log.info( "handleTextMessage : sent workorders back to websocket" );
+
+        }
+
         if( request instanceof OpenWorkorderRequest ) {
 
             OpenWorkorderRequest openWorkorderRequest = (OpenWorkorderRequest) request;
@@ -88,6 +108,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
 
             Map<String, Object> websocketResponse =
                     Map.of(
+                            "requestId", openWorkorderRequest.getRequestId(),
                             "type", "Workorder",
                             "action", openWorkorderRequest.type(),
                             "workorderId", openWorkorderRequest.getWorkorderId(),
@@ -110,6 +131,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
 
             Map<String, Object> websocketResponse =
                     Map.of(
+                            "requestId", startWorkorderRequest.getRequestId(),
                             "type", "Workorder",
                             "action", startWorkorderRequest.type(),
                             "workorderId", startWorkorderRequest.getWorkorderId(),
@@ -132,6 +154,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
 
             Map<String, Object> websocketResponse =
                     Map.of(
+                            "requestId", stopWorkorderRequest.getRequestId(),
                             "type", "Workorder",
                             "action", stopWorkorderRequest.type(),
                             "workorderId", stopWorkorderRequest.getWorkorderId(),
@@ -154,6 +177,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
 
             Map<String, Object> websocketResponse =
                     Map.of(
+                            "requestId", completeWorkorderRequest.getRequestId(),
                             "type", "Workorder",
                             "action", completeWorkorderRequest.type(),
                             "workorderId", completeWorkorderRequest.getWorkorderId(),
@@ -176,6 +200,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
 
             Map<String, Object> websocketResponse =
                     Map.of(
+                            "requestId", transferWorkorderRequest.getRequestId(),
                             "type", "Workorder",
                             "action", transferWorkorderRequest.type(),
                             "workorderId", transferWorkorderRequest.getWorkorderId(),
@@ -213,6 +238,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
 @JsonSubTypes({
         @JsonSubTypes.Type( value = WorkordersRequest.class, name = "WorkordersRequest" ),
         @JsonSubTypes.Type( value = WorkorderRequest.class, name = "WorkorderRequest" ),
+        @JsonSubTypes.Type( value = CreateWorkorderRequest.class, name = "CreateWorkorderRequest" ),
         @JsonSubTypes.Type( value = OpenWorkorderRequest.class, name = "OpenWorkorderRequest" ),
         @JsonSubTypes.Type( value = StartWorkorderRequest.class, name = "StartWorkorderRequest" ),
         @JsonSubTypes.Type( value = StopWorkorderRequest.class, name = "StopWorkorderRequest" ),
@@ -275,17 +301,51 @@ class WorkorderRequest implements WebSocketRequest {
 }
 
 @Value
-@JsonPropertyOrder({ "type", "workorderId" })
+@JsonPropertyOrder({  "requestId","type", "title", "targetNode" })
+@JsonIgnoreProperties( ignoreUnknown = true )
+class CreateWorkorderRequest implements WebSocketRequest {
+
+    Long requestId;
+    String title;
+    String targetNode;
+
+    @JsonCreator
+    public CreateWorkorderRequest(
+            @JsonProperty( "requestId" ) final Long requestId,
+            @JsonProperty( "title" ) final String title,
+            @JsonProperty( "targetNode" ) final String targetNode
+    ) {
+
+        this.requestId = requestId;
+        this.title = title;
+        this.targetNode = targetNode;
+
+    }
+
+    @Override
+    @JsonProperty
+    public String type() {
+
+        return getClass().getSimpleName();
+    }
+
+}
+
+@Value
+@JsonPropertyOrder({ "requestId", "type", "workorderId" })
 @JsonIgnoreProperties( ignoreUnknown = true )
 class OpenWorkorderRequest implements WebSocketRequest {
 
+    Long requestId;
     UUID workorderId;
 
     @JsonCreator
     public OpenWorkorderRequest(
+            @JsonProperty( "requestId" ) final Long requestId,
             @JsonProperty( "workorderId" ) final UUID workorderId
     ) {
 
+        this.requestId = requestId;
         this.workorderId = workorderId;
 
     }
@@ -300,17 +360,20 @@ class OpenWorkorderRequest implements WebSocketRequest {
 }
 
 @Value
-@JsonPropertyOrder({ "type", "workorderId" })
+@JsonPropertyOrder({ "requestId", "type", "workorderId" })
 @JsonIgnoreProperties( ignoreUnknown = true )
 class StartWorkorderRequest implements WebSocketRequest {
 
+    Long requestId;
     UUID workorderId;
 
     @JsonCreator
     public StartWorkorderRequest(
+            @JsonProperty( "requestId" ) final Long requestId,
             @JsonProperty( "workorderId" ) final UUID workorderId
     ) {
 
+        this.requestId = requestId;
         this.workorderId = workorderId;
 
     }
@@ -325,17 +388,20 @@ class StartWorkorderRequest implements WebSocketRequest {
 }
 
 @Value
-@JsonPropertyOrder({ "type", "workorderId" })
+@JsonPropertyOrder({ "requestId", "type", "workorderId" })
 @JsonIgnoreProperties( ignoreUnknown = true )
 class StopWorkorderRequest implements WebSocketRequest {
 
+    Long requestId;
     UUID workorderId;
 
     @JsonCreator
     public StopWorkorderRequest(
+            @JsonProperty( "requestId" ) final Long requestId,
             @JsonProperty( "workorderId" ) final UUID workorderId
     ) {
 
+        this.requestId = requestId;
         this.workorderId = workorderId;
 
     }
@@ -350,17 +416,20 @@ class StopWorkorderRequest implements WebSocketRequest {
 }
 
 @Value
-@JsonPropertyOrder({ "type", "workorderId" })
+@JsonPropertyOrder({ "requestId", "type", "workorderId" })
 @JsonIgnoreProperties( ignoreUnknown = true )
 class CompleteWorkorderRequest implements WebSocketRequest {
 
+    Long requestId;
     UUID workorderId;
 
     @JsonCreator
     public CompleteWorkorderRequest(
+            @JsonProperty( "requestId" ) final Long requestId,
             @JsonProperty( "workorderId" ) final UUID workorderId
     ) {
 
+        this.requestId = requestId;
         this.workorderId = workorderId;
 
     }
@@ -375,19 +444,22 @@ class CompleteWorkorderRequest implements WebSocketRequest {
 }
 
 @Value
-@JsonPropertyOrder({ "type", "workorderId", "targetNode" })
+@JsonPropertyOrder({ "requestId", "type", "workorderId", "targetNode" })
 @JsonIgnoreProperties( ignoreUnknown = true )
 class TransferWorkorderRequest implements WebSocketRequest {
 
+    Long requestId;
     UUID workorderId;
     String targetNode;
 
     @JsonCreator
     public TransferWorkorderRequest(
+            @JsonProperty( "requestId" ) final Long requestId,
             @JsonProperty( "workorderId" ) final UUID workorderId,
             @JsonProperty( "targetNode" ) final String targetNode
     ) {
 
+        this.requestId = requestId;
         this.workorderId = workorderId;
         this.targetNode = targetNode;
 

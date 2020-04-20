@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 import static java.util.Arrays.asList;
@@ -56,12 +57,12 @@ public class CreateWorkorderServiceTests {
         when( this.mockUuidGenerator.generate() ).thenReturn( fakeWorkorderId );
 
         CreateWorkorderUseCase.CreateWorkorderCommand fakeCommand = new CreateWorkorderUseCase.CreateWorkorderCommand( fakeTitle, null );
-        UUID actual = this.subject.execute( fakeCommand );
+        Map<String, Object> actual = this.subject.execute( fakeCommand );
 
         UUID expected = fakeWorkorderId;
         NameUpdated expectedNameUpdatedEvent = new NameUpdated( fakeWorkorderId, fakeTitle, fakeUser, fakeNode, fakeOccurredOn );
 
-        assertThat( actual ).isEqualTo( expected );
+        assertThat( actual.get( "workorderId" ) ).isEqualTo( expected );
 
         verify( this.mockPersistWorkorderEventsPort ).save( fakeWorkorderId, singletonList( expectedNameUpdatedEvent ) );
         verify( this.mockUuidGenerator ).generate();
@@ -79,13 +80,13 @@ public class CreateWorkorderServiceTests {
         when( this.mockUuidGenerator.generate() ).thenReturn( fakeWorkorderId );
 
         CreateWorkorderUseCase.CreateWorkorderCommand fakeCommand = new CreateWorkorderUseCase.CreateWorkorderCommand( fakeTitle, "fakeTargetNode" );
-        UUID actual = this.subject.execute( fakeCommand );
+        Map<String, Object> actual = this.subject.execute( fakeCommand );
 
         UUID expected = fakeWorkorderId;
         NameUpdated expectedNameUpdatedEvent = new NameUpdated( fakeWorkorderId, fakeTitle, fakeUser, fakeNode, fakeOccurredOn );
         NodeAssigned expectedNodeAssignedEvent = new NodeAssigned( fakeWorkorderId, fakeNode, "fakeTargetNode", fakeUser, fakeNode, fakeOccurredOn );
 
-        assertThat( actual ).isEqualTo( expected );
+        assertThat( actual.get( "workorderId" ) ).isEqualTo( expected );
 
         verify( this.mockPersistWorkorderEventsPort ).save( fakeWorkorderId, asList( expectedNameUpdatedEvent, expectedNodeAssignedEvent ) );
         verify( this.mockUuidGenerator ).generate();

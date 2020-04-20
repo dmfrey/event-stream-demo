@@ -11,7 +11,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @EndpointAdapter
@@ -23,9 +22,9 @@ public class CreateWorkorderEndpoint {
     @PostMapping( path = "/workorders" )
     public ResponseEntity createWorkorder( @RequestBody Map<String, String> parameters, UriComponentsBuilder builder ) {
 
-        UUID created = this.useCase.execute( new CreateWorkorderUseCase.CreateWorkorderCommand( parameters.get( "title" ), parameters.getOrDefault( "targetNode", null ) ) );
+        Map<String, Object> created = this.useCase.execute( new CreateWorkorderUseCase.CreateWorkorderCommand( parameters.get( "title" ), parameters.getOrDefault( "targetNode", null ) ) );
 
-        URI location = builder.path( "/workorders/{workorderId}" ).buildAndExpand( created ).toUri();
+        URI location = builder.path( "/workorders/{workorderId}" ).buildAndExpand( created.get( "workorderId" ) ).toUri();
 
         return ResponseEntity
                 .created( location )

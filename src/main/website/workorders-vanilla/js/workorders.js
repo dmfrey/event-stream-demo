@@ -1,5 +1,5 @@
 
-import WorkorderListItemsLoader from "./workorderListItemLoader.js";
+import WorkorderListItemsLoader from './workorderListItemLoader.js';
 
 export class Workorders extends HTMLElement {
 
@@ -7,6 +7,7 @@ export class Workorders extends HTMLElement {
         super();
 
         this._loader = new WorkorderListItemsLoader();
+
     }
 
     async connectedCallback() {
@@ -17,6 +18,28 @@ export class Workorders extends HTMLElement {
         this.updateWorkorders( workorderListItems );
 
         console.log( 'Workorders.connectedCallback : exit' );
+    }
+
+    static get observedAttributes() {
+
+        return [ 'reload' ];
+    }
+
+    async attributeChangedCallback( attrName, oldVal, newVal ) {
+        console.log( `Workorders.attributeChangedCallback : attrName[${attrName}], oldVal[${oldVal}], newVal[${newVal}]`)
+
+        if( attrName === 'reload' ) {
+
+            if( newVal === 'true' ) {
+
+                let workorderListItems = await this._loader.loadWorkorderListItems();
+
+                this.updateWorkorders( workorderListItems );
+
+            }
+
+        }
+
     }
 
     refreshWorkorders() {
@@ -43,7 +66,7 @@ export class Workorders extends HTMLElement {
         workorderListItems
             .forEach( function( workorderListItem ) {
 
-                host.getElementsByTagName( 'section' )[0].appendChild( workorderListItem );
+                host.querySelector( 'section' ).appendChild( workorderListItem );
 
             });
 

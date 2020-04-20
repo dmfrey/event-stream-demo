@@ -1,5 +1,7 @@
 
-export default function template() {
+export default async function template() {
+
+    let nodes = await fetch( '/nodes' ).then( (response) => response.json() );
 
     return `<header>
     <h3>Create New Work Order</h3>
@@ -7,6 +9,8 @@ export default function template() {
 
 <form>
 
+    <input type="hidden" name="type" value="CreateWorkorderRequest" />
+    
     <p>
         <label for="title">Title</label>
         <input type="text" id="title" name="title" />
@@ -15,12 +19,12 @@ export default function template() {
     <p>
         <label for="targetNode">Target Node</label>
         <select id="targetNode" name="targetNode">
-            <option value="---">---</option>
-        </select>
+            ${ nodes.availableNodes.map( node => `<option value="${node}" ${ (node === nodes.currentNode) ? `selected="true"` : `` }>${node}</option>` )}
+    </select>
     </p>
 
     <p>
-        <input type="submit" value="New" />
+        <input type="submit" name="new" value="New" />
     </p>
 
 </form>`;
