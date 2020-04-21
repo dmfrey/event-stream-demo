@@ -5,8 +5,8 @@ import io.pivotal.dmfrey.workorder.application.out.GetAllWorkorderStatesPort;
 import io.pivotal.dmfrey.workorder.application.out.GetWorkorderEventsPort;
 import io.pivotal.dmfrey.workorder.application.out.PersistWorkorderEventPort;
 import io.pivotal.dmfrey.workorder.application.out.WorkorderExistsPort;
-import lombok.RequiredArgsConstructor;
 import io.pivotal.dmfrey.workorder.domain.events.WorkorderDomainEvent;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Map;

@@ -1,9 +1,10 @@
 
 logging:
   level:
-    org.apache.kafka: WARN
+    org.apache.kafka: INFO
+    org.apache.kafka.streams: INFO
     org.springframework.cloud: DEBUG
-    org.springframework.cloud.stream: INFO
+    org.springframework.cloud.stream: DEBUG
     org.springframework.web: DEBUG
     io.pivotal.dmfrey: DEBUG
 
@@ -19,18 +20,21 @@ spring:
 
   cloud:
     stream:
+      function:
+        definition: workorderEventsTableTransformer
+      source: workorder-events
       bindings:
-        workorder-events-output:
+        workorder-events-out-0:
           destination: ${node.current}.workorder-events
-          contentType: application/json
-          producer:
-            headerMode: headers
-        workorder-events-input:
-          destination: ${node.current}.workorder-events
-          group: workorder-events-stream
-          contentType: application/json
-          consumer:
-            headerMode: headers
+#          contentType: application/json
+#          producer:
+#            headerMode: headers
+#        workorderEventsTableTransformer-in-0:
+#          destination: ${node.current}.workorder-events
+#          group: workorder-events-stream
+#          contentType: application/json
+#          consumer:
+#            headerMode: headers
       kafka:
         binder:
           brokers: ["localhost:9092"]
@@ -39,8 +43,12 @@ spring:
             configuration:
               commit.interval.ms: 1000
           bindings:
-            workorder-events-input:
-              consumer.application-id: ${node.current}.event-stream-demo
+            workorder-events-out-0:
+              producer:
+                keySerde: org.apache.kafka.common.serialization.Serdes.UUIDSerde
+                valueSerde: org.springframework.kafka.support.serializer.JsonSerde
+#            workorderEventsTableTransformer-in-0:
+#              consumer.application-id: ${node.current}.event-stream-demo.transformer
             workorder-events-by-id:
               consumer:
                 materializedAs: ${node.current}.workorder-events-by-id

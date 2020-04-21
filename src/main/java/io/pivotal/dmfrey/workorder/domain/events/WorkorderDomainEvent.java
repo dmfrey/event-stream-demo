@@ -1,5 +1,6 @@
 package io.pivotal.dmfrey.workorder.domain.events;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -30,6 +31,7 @@ public interface WorkorderDomainEvent {
 
     ZonedDateTime occurredOn();
 
+    @JsonIgnore
     String eventType();
 
 }

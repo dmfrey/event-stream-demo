@@ -4,22 +4,30 @@ spring:
 
   cloud:
     stream:
+      function:
+        definition: workorderEventsTableTransformer;workorderEventsDistributionSplitter
+      source: workorder-events;workorder-events-distribution-local;workorder-events-distribution-node-17;workorder-events-distribution-node-34
       bindings:
-        workorder-events-distribution:
+        workorderEventsDistributionSplitter-in-0:
           destination: ${node.current}.workorder-events
-          group: workorder-events-distribution
-          contentType: application/json
-          consumer:
-            headerMode: headers
-        workorder-events-distribution-local:
+#          group: workorder-events-distribution
+#          contentType: application/json
+#          consumer:
+#            headerMode: headers
+        workorder-events-distribution-local-out-0:
           destination: ${node.current}.distribution-local
           contentType: application/json
-        workorder-events-distribution-node-17:
+        workorder-events-distribution-node-17-out-0:
           destination: ${node.current}.distribution-node-17
           contentType: application/json
-        workorder-events-distribution-node-34:
+        workorder-events-distribution-node-34-out-0:
           destination: ${node.current}.distribution-node-34
           contentType: application/json
+      kafka:
+        streams:
+          bindings:
+            workorderEventsDistributionSplitter-in-0:
+              consumer.application-id: ${node.current}.event-stream-demo.splitter
 
 node:
   current: cloud
