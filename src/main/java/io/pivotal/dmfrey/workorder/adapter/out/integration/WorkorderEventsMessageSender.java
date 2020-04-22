@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,6 +28,7 @@ class WorkorderEventsMessageSender {
 
     }
 
+    @Transactional
     void processEvents( final UUID workorderId, List<WorkorderDomainEvent> events) {
 
         events.forEach( event -> {

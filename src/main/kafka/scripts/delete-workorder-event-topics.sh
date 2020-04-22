@@ -14,6 +14,7 @@ kafka-topics --zookeeper localhost:2181 --delete --topic node-34.event-stream-de
 kafka-topics --zookeeper localhost:2181 --delete --topic node-34.event-stream-demo-workorder-events-by-id-repartition
 kafka-topics --zookeeper localhost:2181 --delete --topic node-34.workorder-events
 
+kafka-topics --zookeeper localhost:2181 --delete --topic cloud.distribution-cloud
 kafka-topics --zookeeper localhost:2181 --delete --topic cloud.distribution-local
 kafka-topics --zookeeper localhost:2181 --delete --topic cloud.distribution-node-17
 kafka-topics --zookeeper localhost:2181 --delete --topic cloud.distribution-node-34

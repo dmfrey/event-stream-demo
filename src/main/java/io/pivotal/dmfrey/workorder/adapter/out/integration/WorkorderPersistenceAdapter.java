@@ -7,6 +7,7 @@ import io.pivotal.dmfrey.workorder.application.out.PersistWorkorderEventPort;
 import io.pivotal.dmfrey.workorder.application.out.WorkorderExistsPort;
 import io.pivotal.dmfrey.workorder.domain.events.WorkorderDomainEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ class WorkorderPersistenceAdapter implements WorkorderExistsPort, GetWorkorderEv
     }
 
     @Override
+    @Transactional
     public void save( final UUID workorderId, final List<WorkorderDomainEvent> events ) {
 
         sender.processEvents( workorderId, events );

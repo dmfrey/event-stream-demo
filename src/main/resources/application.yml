@@ -1,16 +1,20 @@
 
 logging:
   level:
-    org.apache.kafka: INFO
-    org.apache.kafka.streams: INFO
+    org.apache.kafka: WARN
+    org.apache.kafka.streams: WARN
     org.springframework.cloud: DEBUG
     org.springframework.cloud.stream: DEBUG
+    org.springframework.retry: DEBUG
     org.springframework.web: DEBUG
     io.pivotal.dmfrey: DEBUG
 
 node:
   current: local
   available: local, cloud, node-17, node-34
+
+server:
+  port: 9080
 
 spring:
 
@@ -21,20 +25,16 @@ spring:
   cloud:
     stream:
       function:
-        definition: workorderEventsTableTransformer
+        definition: workorderEvents
+      functions:
+        workorderEvents:
+          applicationId: ${node.current}.event-stream-demo
       source: workorder-events
       bindings:
         workorder-events-out-0:
           destination: ${node.current}.workorder-events
-#          contentType: application/json
-#          producer:
-#            headerMode: headers
-#        workorderEventsTableTransformer-in-0:
-#          destination: ${node.current}.workorder-events
-#          group: workorder-events-stream
-#          contentType: application/json
-#          consumer:
-#            headerMode: headers
+        workorderEvents-in-0:
+          destination: ${node.current}.workorder-events
       kafka:
         binder:
           brokers: ["localhost:9092"]
@@ -42,13 +42,14 @@ spring:
           binder:
             configuration:
               commit.interval.ms: 1000
+            state-store-retry:
+              max-attempts: 5
+              backoff-period: 1000
+            transaction:
+              transaction-id-prefix: tx-
           bindings:
-            workorder-events-out-0:
-              producer:
-                keySerde: org.apache.kafka.common.serialization.Serdes.UUIDSerde
-                valueSerde: org.springframework.kafka.support.serializer.JsonSerde
-#            workorderEventsTableTransformer-in-0:
-#              consumer.application-id: ${node.current}.event-stream-demo.transformer
+#            workorderEvents-in-0:
+#              consumer.application-id: ${node.current}.event-stream-demo
             workorder-events-by-id:
               consumer:
                 materializedAs: ${node.current}.workorder-events-by-id

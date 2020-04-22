@@ -4,14 +4,15 @@ spring:
 
   cloud:
     stream:
+      function:
+        definition: workorderEvents;workorderEventsDistribution
+      functions:
+        workorderEventsDistribution:
+          applicationId: ${node.current}.event-stream-demo.distribution-cloud
+      source: workorder-events;workorder-events-distribution-cloud
       bindings:
-        workorder-events-distribution:
+        workorderEventsDistribution-in-0:
           destination: ${node.current}.workorder-events
-          group: workorder-events-distribution
-          contentType: application/json
-          consumer:
-            headerMode: headers
-        workorder-events-distribution-cloud:
+        workorder-events-distribution-cloud-out-0:
           destination: ${node.current}.distribution-cloud
-          contentType: application/json
 
