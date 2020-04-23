@@ -95,7 +95,7 @@ class DistributionBindingConfig {
                             log.info( "workorderEventsDistribution : transfer initiated, sending all events" );
 
                             final String target = String.format( "workorder-events-distribution-%s-out-0", ( (NodeAssigned) event ).targetNode() );
-                            log.info( "workorderEventsDistribution : sending all to target={}", target );
+                            log.info( "workorderEventsDistribution : sending all events for workorderId[{}] to target={}", event.workorderId(), target );
 
                             this.workorderEventsLookup.lookupByWorkorderId( event.workorderId() )
                                     .forEach( e -> {
@@ -110,6 +110,7 @@ class DistributionBindingConfig {
 
                                     });
 
+                            log.info( "workorderEventsDistribution : sending `NodeAssigned` event for workorderId[{}] to target={}", event.workorderId(), target );
                             this.streamBridge.send( target,
                                     MessageBuilder
                                             .withPayload( event )
@@ -118,9 +119,9 @@ class DistributionBindingConfig {
                             );
 
                             String currentTarget = String.format( "workorder-events-distribution-%s-out-0", ( (NodeAssigned) event ).currentNode() );
-                            log.info( "workorderEventsDistribution : sending to target={}", currentTarget );
+                            log.info( "workorderEventsDistribution : sending 'NodeAssigned' to currentTarget={}", currentTarget );
 
-                            this.streamBridge.send( target,
+                            this.streamBridge.send( currentTarget,
                                     MessageBuilder
                                             .withPayload( event )
                                             .setHeader( "workorderId", event.workorderId() )

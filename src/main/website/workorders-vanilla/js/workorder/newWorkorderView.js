@@ -19,7 +19,7 @@ export default async function template() {
     <p>
         <label for="targetNode">Target Node</label>
         <select id="targetNode" name="targetNode">
-            ${ nodes.availableNodes.map( node => `<option value="${node}" ${ (node === nodes.currentNode) ? `selected="true"` : `` }>${node}</option>` )}
+            ${ nodes.availableNodes.filter( node => node !== 'cloud' ).map( node => `<option value="${node}" ${ (node === nodes.currentNode) ? `selected="true"` : `` }>${node}</option>` )}
     </select>
     </p>
 
