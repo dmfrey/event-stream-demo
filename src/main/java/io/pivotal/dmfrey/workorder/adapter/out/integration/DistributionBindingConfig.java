@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -29,7 +30,7 @@ class DistributionBindingConfig {
         private final StreamBridge streamBridge;
 
         @Bean
-        public Consumer<KStream<UUID, WorkorderDomainEvent>> workorderEventsDistribution() {
+        public Consumer<KStream<UUID, WorkorderDomainEvent>> workorderEventsDistributionCloud() {
 
             return events -> events
                     .process( () -> new Processor<>() {
@@ -84,7 +85,7 @@ class DistributionBindingConfig {
         private final WorkorderEventsLookup workorderEventsLookup;
 
         @Bean
-        public Consumer<KStream<Object, WorkorderDomainEvent>> workorderEventsDistribution() {
+        public Consumer<KStream<Object, WorkorderDomainEvent>> workorderEventsDistributionNodes() {
 
             return events -> events
                     .foreach( (key,event) -> {
@@ -93,7 +94,7 @@ class DistributionBindingConfig {
                         if( event instanceof NodeAssigned) {
                             log.info( "workorderEventsDistribution : transfer initiated, sending all events" );
 
-                            final String target = String.format( "workorder-events-distribution-%s-out-0", ( (NodeAssigned) event).targetNode() );
+                            final String target = String.format( "workorder-events-distribution-%s-out-0", ( (NodeAssigned) event ).targetNode() );
                             log.info( "workorderEventsDistribution : sending all to target={}", target );
 
                             this.workorderEventsLookup.lookupByWorkorderId( event.workorderId() )
@@ -129,15 +130,28 @@ class DistributionBindingConfig {
                         } else {
                             log.info( "workorderEventsDistribution : sending event" );
 
-                            String target = String.format( "workorder-events-distribution-%s-out-0", event.node() );
-                            log.info( "workorderEventsDistribution : sending to target={}", target );
+                            this.workorderEventsLookup.lookupByWorkorderId( event.workorderId() ).stream()
+                                    .filter( e -> e.eventType().equals( "NodeAssigned" ) )
+                                    .map( e -> (NodeAssigned) e )
+                                    .sorted( Comparator.comparing( NodeAssigned::occurredOn ).reversed() )
+                                    .map( NodeAssigned::targetNode )
+                                    .findFirst()
+                                    .ifPresentOrElse(
+                                            targetNode -> {
 
-                            this.streamBridge.send( target,
-                                    MessageBuilder
-                                            .withPayload( event )
-                                            .setHeader( "workorderId", event.workorderId() )
-                                            .build()
-                            );
+                                                String target = String.format( "workorder-events-distribution-%s-out-0", targetNode );
+                                                log.info( "workorderEventsDistribution : sending to target={}", target );
+
+                                                this.streamBridge.send( target,
+                                                        MessageBuilder
+                                                                .withPayload( event )
+                                                                .setHeader( "workorderId", event.workorderId() )
+                                                                .build()
+                                                );
+
+                                            },
+                                            () -> log.error( "workorderEventsDistribution : failed to send event! {}", event )
+                                    );
 
                         }
 

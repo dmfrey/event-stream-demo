@@ -20,7 +20,7 @@ import static lombok.AccessLevel.NONE;
 public class NameUpdated extends AbstractWorkOrderDomainEvent {
 
     @Getter( NONE )
-    private final String title;
+    String title;
 
     @JsonCreator
     public NameUpdated(

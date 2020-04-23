@@ -4,7 +4,7 @@ logging:
     org.apache.kafka: WARN
     org.apache.kafka.streams: WARN
     org.springframework.cloud: DEBUG
-    org.springframework.cloud.stream: DEBUG
+    org.springframework.cloud.stream: INFO
     org.springframework.retry: DEBUG
     org.springframework.web: DEBUG
     io.pivotal.dmfrey: DEBUG
@@ -48,11 +48,12 @@ spring:
             transaction:
               transaction-id-prefix: tx-
           bindings:
-#            workorderEvents-in-0:
-#              consumer.application-id: ${node.current}.event-stream-demo
-            workorder-events-by-id:
-              consumer:
-                materializedAs: ${node.current}.workorder-events-by-id
+            workorder-events-out-0:
+              consumer.application-id: ${node.current}.event-stream-demo.workorder-events
+#          bindings:
+#            workorder-events-by-id:
+#              consumer:
+#                materializedAs: ${node.current}.workorder-events-by-id
 
 #Actuator
 management:

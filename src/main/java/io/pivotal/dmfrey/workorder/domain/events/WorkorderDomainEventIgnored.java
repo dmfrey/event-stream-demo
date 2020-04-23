@@ -18,13 +18,13 @@ import static lombok.AccessLevel.NONE;
 public class WorkorderDomainEventIgnored implements WorkorderDomainEvent {
 
     @Getter( NONE )
-    private final UUID workorderId;
+    UUID workorderId;
 
     @Getter( NONE )
-    private final String user;
+    String user;
 
     @Getter( NONE )
-    private final ZonedDateTime occurredOn;
+    ZonedDateTime occurredOn;
 
     @JsonCreator
     public WorkorderDomainEventIgnored(

@@ -3,12 +3,12 @@ package io.pivotal.dmfrey.workorder.domain.events;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import lombok.Value;
+import lombok.*;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
+
+import static lombok.AccessLevel.NONE;
 
 @Value
 @EqualsAndHashCode( callSuper = true )
@@ -16,8 +16,11 @@ import java.util.UUID;
 @JsonPropertyOrder({ "eventType", "workorderId", "currentNode", "targetNode", "user", "node", "occurredOn" })
 public class NodeAssigned extends AbstractWorkOrderDomainEvent {
 
-    private final String currentNode;
-    private final String targetNode;
+    @Getter( NONE )
+    String currentNode;
+
+    @Getter( NONE )
+    String targetNode;
 
     @JsonCreator
     public NodeAssigned(

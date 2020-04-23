@@ -5,14 +5,16 @@ spring:
   cloud:
     stream:
       function:
-        definition: workorderEvents;workorderEventsDistribution
-      functions:
-        workorderEventsDistribution:
-          applicationId: ${node.current}.event-stream-demo.distribution-cloud
+        definition: workorderEvents;workorderEventsDistributionCloud
       source: workorder-events;workorder-events-distribution-cloud
       bindings:
-        workorderEventsDistribution-in-0:
+        workorderEventsDistributionCloud-in-0:
           destination: ${node.current}.workorder-events
         workorder-events-distribution-cloud-out-0:
           destination: ${node.current}.distribution-cloud
+      kafka:
+        streams:
+          bindings:
+            workorderEventsDistributionCloud-in-0:
+              consumer.application-id: ${node.current}.event-stream-demo.distribution-cloud
 
