@@ -1,11 +1,9 @@
 package io.pivotal.dmfrey.workorder.adapter.out.integration;
 
-import lombok.extern.slf4j.Slf4j;
 import io.pivotal.dmfrey.workorder.domain.events.WorkorderDomainEvent;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
@@ -16,29 +14,28 @@ import java.util.UUID;
 @Component
 class WorkorderEventsMessageSender {
 
-    private final MessageChannel output;
+    private final StreamBridge streamBridge;
     private final String node;
 
     WorkorderEventsMessageSender(
-            @Qualifier( "workorder-events-output" ) final MessageChannel output,
+            final StreamBridge streamBridge,
             @Value( "${node.current}" ) final String node
     ) {
 
-        this.output = output;
+        this.streamBridge = streamBridge;
         this.node = node;
 
     }
 
-    @SendTo( WorkorderBindingConfig.WorkorderEventsProcessor.OUTPUT )
-    void processEvents( final UUID workorderId, List<WorkorderDomainEvent> events) {
+    void processEvents(final UUID workorderId, List<WorkorderDomainEvent> events ) {
 
         events.forEach( event -> {
             log.info( "processEvents : event={}", event );
-            output.send(
+            this.streamBridge.send( "workorder-events-out-0",
                     MessageBuilder
-                            .withPayload(event)
-                            .setHeader("workorderId", workorderId)
-                            .setHeader("originationNode", node)
+                            .withPayload( event )
+                            .setHeader("workorderId", workorderId )
+                            .setHeader("originationNode", node )
                             .build()
             );
         });

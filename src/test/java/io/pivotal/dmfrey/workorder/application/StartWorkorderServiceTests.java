@@ -5,12 +5,12 @@ import io.pivotal.dmfrey.node.application.in.NodeValidatorQuery;
 import io.pivotal.dmfrey.workorder.application.in.StartWorkorderUseCase;
 import io.pivotal.dmfrey.workorder.application.out.GetWorkorderEventsPort;
 import io.pivotal.dmfrey.workorder.application.out.PersistWorkorderEventPort;
-import io.pivotal.dmfrey.workorder.domain.events.WorkorderOpened;
-import io.pivotal.dmfrey.workorder.domain.events.WorkorderStarted;
 import io.pivotal.dmfrey.workorder.domain.events.NameUpdated;
 import io.pivotal.dmfrey.workorder.domain.events.WorkorderDomainEvent;
-import org.junit.Before;
-import org.junit.Test;
+import io.pivotal.dmfrey.workorder.domain.events.WorkorderOpened;
+import io.pivotal.dmfrey.workorder.domain.events.WorkorderStarted;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -36,7 +36,7 @@ public class StartWorkorderServiceTests {
     private String fakeNode = "fakeNode";
     private ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         this.mockGetWorkorderEventsPort = mock( GetWorkorderEventsPort.class );
@@ -67,6 +67,7 @@ public class StartWorkorderServiceTests {
         verify( this.mockPersistWorkorderEventPort ).save( fakeWorkorderId, expectedEvents );
         verify( this.mockTimestampGenerator ).generate();
         verifyNoMoreInteractions( this.mockGetWorkorderEventsPort, this.mockPersistWorkorderEventPort, this.mockTimestampGenerator );
+
     }
 
 }

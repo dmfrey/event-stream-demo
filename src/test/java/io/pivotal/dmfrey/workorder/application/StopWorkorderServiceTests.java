@@ -6,8 +6,8 @@ import io.pivotal.dmfrey.workorder.application.in.StopWorkorderUseCase;
 import io.pivotal.dmfrey.workorder.application.out.GetWorkorderEventsPort;
 import io.pivotal.dmfrey.workorder.application.out.PersistWorkorderEventPort;
 import io.pivotal.dmfrey.workorder.domain.events.*;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -33,7 +33,7 @@ public class StopWorkorderServiceTests {
     private String fakeNode = "fakeNode";
     private ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         this.mockGetWorkorderEventsPort = mock( GetWorkorderEventsPort.class );
@@ -65,6 +65,7 @@ public class StopWorkorderServiceTests {
         verify( this.mockPersistWorkorderEventPort ).save( fakeWorkorderId, expectedEvents );
         verify( this.mockTimestampGenerator ).generate();
         verifyNoMoreInteractions( this.mockGetWorkorderEventsPort, this.mockPersistWorkorderEventPort, this.mockTimestampGenerator );
+
     }
 
 }

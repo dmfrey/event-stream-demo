@@ -3,8 +3,8 @@ package io.pivotal.dmfrey.workorder.application;
 import io.pivotal.dmfrey.workorder.application.in.GetWorkorderQuery;
 import io.pivotal.dmfrey.workorder.application.out.GetWorkorderEventsPort;
 import io.pivotal.dmfrey.workorder.domain.events.NameUpdated;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -28,7 +28,7 @@ public class GetWorkorderServiceTests {
     private String fakeUser = "fakeUser";
     private String fakeNode = "fakeNode";
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         this.mockGetWorkorderEventsPort = mock( GetWorkorderEventsPort.class );

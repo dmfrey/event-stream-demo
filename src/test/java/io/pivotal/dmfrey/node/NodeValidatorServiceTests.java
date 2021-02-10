@@ -1,8 +1,8 @@
 package io.pivotal.dmfrey.node;
 
 import io.pivotal.dmfrey.node.application.in.NodeValidatorQuery;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,7 +12,7 @@ public class NodeValidatorServiceTests {
 
     private String fakeNode = "fakeNode";
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         this.subject = new NodeValidatorService( fakeNode );

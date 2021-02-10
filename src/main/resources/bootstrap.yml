@@ -8,7 +8,10 @@ spring:
 
 ---
 spring:
-  profiles: kubernetes
+
+  config:
+    activate:
+      on-cloud-platform: kubernetes
 
   cloud:
     kubernetes:

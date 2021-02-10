@@ -33,10 +33,10 @@ how projections are derived from the event history.
 
 ## Prerequisits
 
-* Java 8
+* Java 11
 
 ```bash
-$ brew cask install adoptopenjdk8
+$ brew cask install adoptopenjdk11
 ```
 
 * Apache Kafka

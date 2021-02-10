@@ -1,162 +1,114 @@
 package io.pivotal.dmfrey.workorder.adapter.out.integration;
 
-import lombok.extern.slf4j.Slf4j;
 import io.pivotal.dmfrey.workorder.domain.events.NodeAssigned;
 import io.pivotal.dmfrey.workorder.domain.events.WorkorderDomainEvent;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.annotation.Input;
-import org.springframework.cloud.stream.annotation.Output;
-import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.integration.filter.ExpressionEvaluatingSelector;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.support.MessageBuilder;
 
+import java.util.function.Consumer;
+
 @Slf4j
+@Configuration
 class DistributionBindingConfig {
 
     @Profile( "!cloud" )
-    @EnableBinding( Node.NodeDistributionProcessor.class )
+    @Configuration
     static class Node {
 
-        private final MessageChannel outputCloud;
+        private static final String OUTPUT_CLOUD = "workorder-events-distribution-cloud-out-0";
 
-        Node(
-                @Qualifier( "workorder-events-distribution-cloud" ) final MessageChannel outputCloud
-        ) {
+        @Bean
+        public Consumer<Message<WorkorderDomainEvent>> workorderEventsDistribution( final StreamBridge streamBridge, final ExpressionEvaluatingSelector headerExpressionEvaluatingSelector ) {
 
-            this.outputCloud = outputCloud;
+            return message -> {
+                log.debug( "workorderEventsDistribution : message={}", message );
 
+                if( headerExpressionEvaluatingSelector.accept( message ) ) {
+
+                    streamBridge.send( OUTPUT_CLOUD, message );
+                }
+
+            };
         }
 
-        @StreamListener( target = NodeDistributionProcessor.INPUT_STREAM )
-        void process( Message<WorkorderDomainEvent> message ) {
-            log.info( "process : message={}", message );
+        @Bean
+        public ExpressionEvaluatingSelector headerExpressionEvaluatingSelector() {
 
-            if( !message.getHeaders().containsKey( "originationNode" ) ) {
-                log.info( "process : message did not originate here" );
-
-                return;
-            }
-
-            outputCloud.send(
-                    MessageBuilder
-                            .withPayload( message.getPayload() )
-                            .setHeader( "workorderId", message.getPayload().workorderId() )
-                            .build() );
-
-        }
-
-        interface NodeDistributionProcessor {
-
-            String INPUT_STREAM = "workorder-events-distribution";
-            String OUTPUT_CLOUD = "workorder-events-distribution-cloud";
-
-            @Input( INPUT_STREAM )
-            SubscribableChannel input();
-
-            @Output( OUTPUT_CLOUD )
-            MessageChannel outputCloud();
-
+            return new ExpressionEvaluatingSelector( "headers.containsKey('originationNode')" );
         }
 
     }
 
+    @Configuration
     @Profile( "cloud" )
-    @EnableBinding( Cloud.CloudDistributionProcessor.class )
     static class Cloud {
 
-        private final BinderAwareChannelResolver resolver;
-        private final WorkorderEventsLookup workorderEventsLookup;
+        private static final String OUTPUT_TARGET_TEMPLATE = "workorder-events-distribution-%s-out-0";
 
-        Cloud(
-                final BinderAwareChannelResolver resolver,
-                final WorkorderEventsLookup workorderEventsLookup
-        ) {
+        @Bean
+        public Consumer<Message<WorkorderDomainEvent>> workorderEventsDistribution( final StreamBridge streamBridge, final WorkorderPersistenceAdapter workorderPersistenceAdapter ) {
 
-            this.resolver = resolver;
-            this.workorderEventsLookup = workorderEventsLookup;
+            return message -> {
+                log.debug( "workorderEventsDistribution : message={}", message );
 
-        }
+                WorkorderDomainEvent event = message.getPayload();
+                if( event instanceof NodeAssigned ) {
+                    log.debug( "workorderEventsDistribution : transfer initiated, sending all events" );
 
-        @StreamListener( target = CloudDistributionProcessor.INPUT_STREAM )
-        void process( Message<WorkorderDomainEvent> message ) {
-            log.info( "process : message={}", message );
+                    final String target = String.format( OUTPUT_TARGET_TEMPLATE, ((NodeAssigned) event ).targetNode() );
+                    log.debug( "workorderEventsDistribution : sending all to target={}", target );
 
-            WorkorderDomainEvent event = message.getPayload();
-            if( event instanceof NodeAssigned ) {
-                log.info( "process : transfer initiated, sending all events" );
+                    workorderPersistenceAdapter.getWorkorderEvents( event.workorderId() )
+                            .forEach( e -> {
+                                log.debug( "workorderEventsDistribution : event={}", e );
 
-                final String target = String.format( "cloud.distribution-%s", ((NodeAssigned) event).targetNode() );
-                log.info( "process : sending all to target={}", target );
+                                streamBridge.send( target,
+                                        MessageBuilder
+                                                .withPayload( e )
+                                                .setHeader( "workorderId", e.workorderId() )
+                                                .build()
+                                );
 
-                this.workorderEventsLookup.lookupByWorkorderId( event.workorderId() )
-                    .forEach( e -> {
-                        log.info( "process : event={}", e );
+                            });
 
-                        Message m = MessageBuilder
-                                .withPayload( e )
-                                .setHeader( "workorderId", e.workorderId() )
-                                .build();
+                    streamBridge.send( target,
+                            MessageBuilder
+                                    .withPayload( event )
+                                    .setHeader("workorderId", event.workorderId() )
+                                    .build()
+                    );
 
-                        resolver.resolveDestination( target ).send( m );
+                    String currentTarget = String.format( OUTPUT_TARGET_TEMPLATE, ((NodeAssigned) event).currentNode() );
+                    log.debug( "workorderEventsDistribution : sending to target={}", currentTarget );
 
-                    });
+                    streamBridge.send( currentTarget,
+                            MessageBuilder
+                                    .withPayload( event )
+                                    .setHeader("workorderId", event.workorderId() )
+                                    .build()
+                    );
 
-                resolver.resolveDestination( target ).send(
-                        MessageBuilder
-                                .withPayload( event )
-                                .setHeader("workorderId", event.workorderId() )
-                                .build()
-                );
+                } else {
+                    log.debug( "workorderEventsDistribution : sending event" );
 
-                String currentTarget = String.format( "cloud.distribution-%s", ((NodeAssigned) event).currentNode() );
-                log.info( "process : sending to target={}", currentTarget );
+                    String target = String.format( OUTPUT_TARGET_TEMPLATE, event.node() );
+                    log.debug( "workorderEventsDistribution : sending to target={}", target );
 
-                resolver.resolveDestination( currentTarget ).send(
-                        MessageBuilder
-                                .withPayload( event )
-                                .setHeader("workorderId", event.workorderId() )
-                                .build()
-                );
+                    streamBridge.send( target,
+                            MessageBuilder
+                                    .withPayload( event )
+                                    .setHeader("workorderId", event.workorderId() )
+                                    .build()
+                    );
+                }
 
-            } else {
-                log.info( "process : sending event" );
-
-                String target = String.format( "cloud.distribution-%s", event.node() );
-                log.info( "process : sending to target={}", target );
-
-                resolver.resolveDestination( target ).send(
-                        MessageBuilder
-                                .withPayload( event )
-                                .setHeader("workorderId", event.workorderId() )
-                                .build()
-                );
-            }
-
-        }
-
-        interface CloudDistributionProcessor {
-
-            String INPUT_STREAM = "workorder-events-distribution";
-            String OUTPUT_LOCAL = "workorder-events-distribution-local";
-            String OUTPUT_NODE_17 = "workorder-events-distribution-node-17";
-            String OUTPUT_NODE_34 = "workorder-events-distribution-node-34";
-
-            @Input( INPUT_STREAM )
-            SubscribableChannel input();
-
-            @Output( OUTPUT_LOCAL )
-            MessageChannel outputLocal();
-
-            @Output( OUTPUT_NODE_17 )
-            MessageChannel outputNode17();
-
-            @Output( OUTPUT_NODE_34 )
-            MessageChannel outputNode34();
+            };
 
         }
 

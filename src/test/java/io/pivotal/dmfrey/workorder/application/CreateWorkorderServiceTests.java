@@ -7,8 +7,8 @@ import io.pivotal.dmfrey.workorder.application.in.CreateWorkorderUseCase;
 import io.pivotal.dmfrey.workorder.application.out.PersistWorkorderEventPort;
 import io.pivotal.dmfrey.workorder.domain.events.NameUpdated;
 import io.pivotal.dmfrey.workorder.domain.events.NodeAssigned;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -33,7 +33,7 @@ public class CreateWorkorderServiceTests {
     private String fakeUser = "testUser";
     private String fakeNode = "fakeNode";
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         this.mockPersistWorkorderEventsPort = mock( PersistWorkorderEventPort.class );

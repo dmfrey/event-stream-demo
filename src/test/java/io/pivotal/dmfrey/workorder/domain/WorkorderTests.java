@@ -2,7 +2,7 @@ package io.pivotal.dmfrey.workorder.domain;
 
 import io.pivotal.dmfrey.workorder.domain.WorkorderExceptions.*;
 import io.pivotal.dmfrey.workorder.domain.events.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class WorkorderTests {
 
@@ -104,107 +105,143 @@ public class WorkorderTests {
         assertThat( subject ).isEqualTo( replay );
     }
 
-    @Test( expected = WorkorderAlreadyOpenedException.class )
+    @Test
     public void testOpenWorkorder_verifyWorkorderAlreadyOpenedException_whenAlreadyInProcess() {
 
-        ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
+        assertThrows( WorkorderAlreadyOpenedException.class, () -> {
 
-        Workorder subject = new Workorder( fakeWorkorderId );
-        subject.openWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
 
-        subject.openWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            Workorder subject = new Workorder( fakeWorkorderId );
+            subject.openWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+            subject.openWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+        });
 
     }
 
-    @Test( expected = WorkorderAlreadyInProcessException.class )
+    @Test
     public void testOpenWorkorder_verifyWorkorderAlreadyInProcessException_whenAlreadyInProcess() {
 
-        ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
+        assertThrows( WorkorderAlreadyInProcessException.class, () -> {
 
-        Workorder subject = new Workorder( fakeWorkorderId );
-        subject.startWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
 
-        subject.openWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            Workorder subject = new Workorder( fakeWorkorderId );
+            subject.startWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+            subject.openWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+        });
 
     }
 
-    @Test( expected = WorkorderAlreadyReviewedException.class )
+    @Test
     public void testOpenWorkorder_verifyWorkorderAlreadyReviewedException_whenAlreadyInReview() {
 
-        ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
+        assertThrows( WorkorderAlreadyReviewedException.class, () -> {
 
-        Workorder subject = new Workorder( fakeWorkorderId );
-        subject.stopWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
 
-        subject.openWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            Workorder subject = new Workorder( fakeWorkorderId );
+            subject.stopWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+            subject.openWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+        });
 
     }
 
-    @Test( expected = WorkorderAlreadyCompleteException.class )
+    @Test
     public void testOpenWorkorder_verifyWorkorderAlreadyCompleteException_whenAlreadyComplete() {
 
-        ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
+        assertThrows( WorkorderAlreadyCompleteException.class, () -> {
 
-        Workorder subject = new Workorder( fakeWorkorderId );
-        subject.completeWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
 
-        subject.openWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            Workorder subject = new Workorder( fakeWorkorderId );
+            subject.completeWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+            subject.openWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+        });
 
     }
 
-    @Test( expected = WorkorderAlreadyReviewedException.class )
+    @Test
     public void testStartWorkorder_verifyWorkorderAlreadyReviewedException_whenAlreadyInReview() {
 
-        ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
+        assertThrows( WorkorderAlreadyReviewedException.class, () -> {
 
-        Workorder subject = new Workorder( fakeWorkorderId );
-        subject.stopWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
 
-        subject.startWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            Workorder subject = new Workorder( fakeWorkorderId );
+            subject.stopWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+            subject.startWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+        });
 
     }
 
-    @Test( expected = WorkorderAlreadyCompleteException.class )
+    @Test
     public void testStartWorkorder_verifyWorkorderAlreadyCompleteException_whenAlreadyComplete() {
 
-        ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
+        assertThrows( WorkorderAlreadyCompleteException.class, () -> {
 
-        Workorder subject = new Workorder( fakeWorkorderId );
-        subject.completeWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
 
-        subject.startWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            Workorder subject = new Workorder( fakeWorkorderId );
+            subject.completeWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+            subject.startWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+        });
 
     }
 
-    @Test( expected = WorkorderAlreadyCompleteException.class )
+    @Test
     public void testStopWorkorder_verifyWorkorderAlreadyCompleteException_whenAlreadyComplete() {
 
-        ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
+        assertThrows( WorkorderAlreadyCompleteException.class, () -> {
 
-        Workorder subject = new Workorder( fakeWorkorderId );
-        subject.completeWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
 
-        subject.stopWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+            Workorder subject = new Workorder( fakeWorkorderId );
+            subject.completeWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+            subject.stopWorkorder( fakeUser, fakeNode, fakeOccurredOn );
+
+        });
 
     }
 
-    @Test( expected = MissingUserException.class )
+    @Test
     public void testWorkorder_verifyMissingUserException_whenUserIsNull() {
 
-        ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
+        assertThrows( MissingUserException.class, () -> {
 
-        Workorder subject = new Workorder( fakeWorkorderId );
-        subject.updateName( fakeTitle, null, null, fakeOccurredOn );
+            ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
+
+            Workorder subject = new Workorder( fakeWorkorderId );
+            subject.updateName( fakeTitle, null, null, fakeOccurredOn );
+
+        });
 
     }
 
-    @Test( expected = MissingUserException.class )
+    @Test
     public void testWorkorder_verifyMissingUserException_whenUserIsEmpty() {
 
-        ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
+        assertThrows( MissingUserException.class, () -> {
 
-        Workorder subject = new Workorder( fakeWorkorderId );
-        subject.updateName( fakeTitle, "", fakeNode, fakeOccurredOn );
+            ZonedDateTime fakeOccurredOn = ZonedDateTime.now( ZoneId.of( "UTC" ) );
+
+            Workorder subject = new Workorder( fakeWorkorderId );
+            subject.updateName( fakeTitle, "", fakeNode, fakeOccurredOn );
+
+        });
 
     }
 

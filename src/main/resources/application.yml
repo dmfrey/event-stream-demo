@@ -20,17 +20,17 @@ spring:
   cloud:
     stream:
       bindings:
-        workorder-events-output:
+        workorder-events-out-0:
           destination: ${node.current}.workorder-events
           contentType: application/json
-          producer:
-            headerMode: headers
-        workorder-events-input:
+#          producer:
+#            headerMode: headers
+        workorder-events-in-0:
           destination: ${node.current}.workorder-events
           group: workorder-events-stream
-          contentType: application/json
-          consumer:
-            headerMode: headers
+#          contentType: application/json
+#          consumer:
+#            headerMode: headers
       kafka:
         binder:
           brokers: ["localhost:9092"]
@@ -39,7 +39,7 @@ spring:
             configuration:
               commit.interval.ms: 1000
           bindings:
-            workorder-events-input:
+            workorder-events-in-0:
               consumer.application-id: ${node.current}.event-stream-demo
             workorder-events-by-id:
               consumer:

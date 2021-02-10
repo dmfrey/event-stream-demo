@@ -1,25 +1,23 @@
 ---
 spring:
-  profiles: cloud
 
   cloud:
+
     stream:
+
+      function:
+        definition: workorderEventsDistribution
+
       bindings:
-        workorder-events-distribution:
+        workorder-events-distribution-in-0:
           destination: ${node.current}.workorder-events
           group: workorder-events-distribution
-          contentType: application/json
-          consumer:
-            headerMode: headers
-        workorder-events-distribution-local:
+        workorder-events-distribution-local-out-0:
           destination: ${node.current}.distribution-local
-          contentType: application/json
-        workorder-events-distribution-node-17:
+        workorder-events-distribution-node-17-out-0:
           destination: ${node.current}.distribution-node-17
-          contentType: application/json
-        workorder-events-distribution-node-34:
+        workorder-events-distribution-node-34-out-0:
           destination: ${node.current}.distribution-node-34
-          contentType: application/json
 
 node:
   current: cloud

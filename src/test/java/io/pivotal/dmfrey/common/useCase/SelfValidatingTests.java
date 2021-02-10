@@ -1,25 +1,32 @@
 package io.pivotal.dmfrey.common.useCase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotEmpty;
 
 public class SelfValidatingTests {
 
-    @Test( expected = ConstraintViolationException.class )
+    @Test
     public void testValidateSelf_verifyConstraintViolationException_whenNameIsNull() {
 
-        TestClass testClass = new TestClass( null );
+        Assertions.assertThrows( ConstraintViolationException.class, () -> {
 
+            new TestClass( null );
+
+        });
 
     }
 
-    @Test( expected = ConstraintViolationException.class )
+    @Test
     public void testValidateSelf_verifyConstraintViolationException_whenNameIsEmpty() {
 
-        TestClass testClass = new TestClass( "" );
+        Assertions.assertThrows( ConstraintViolationException.class, () -> {
 
+            new TestClass( "" );
+
+        });
 
     }
 

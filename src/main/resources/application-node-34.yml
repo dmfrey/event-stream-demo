@@ -1,7 +1,4 @@
 ---
-spring:
-  profiles: node-34
-
 node:
   current: node-34
 
